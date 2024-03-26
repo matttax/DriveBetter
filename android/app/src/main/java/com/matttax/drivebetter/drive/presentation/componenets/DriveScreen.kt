@@ -22,7 +22,7 @@ import com.matttax.drivebetter.ui.theme.TinkoffYellow
 import com.matttax.drivebetter.ui.theme.tinkoffMedium
 
 @Composable
-fun RideScreen(viewModel: DriveViewModel) {
+fun DriveScreen(viewModel: DriveViewModel) {
     val dashboard by viewModel.dashboard.collectAsState()
     val gpsSignal by viewModel.gpsSignalStrengthPercentage.collectAsState()
     val drivingState by viewModel.drivingState.collectAsState()

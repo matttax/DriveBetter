@@ -1,6 +1,7 @@
 package com.matttax.drivebetter.speedometer
 
 import com.matttax.drivebetter.history.DriveRepository
+import com.matttax.drivebetter.profile.data.AccountRepository
 import com.matttax.drivebetter.speedometer.location.LocationProvider
 import com.matttax.drivebetter.speedometer.model.DashboardData
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +11,8 @@ import javax.inject.Inject
 
 class DriveManager @Inject constructor(
     private val locationProvider: LocationProvider,
-    private val driveRepository: DriveRepository
+    private val driveRepository: DriveRepository,
+    private val accountRepository: AccountRepository
 ) {
 
     private var currentRideDataCollector: CurrentRideDataCollector? = null
@@ -76,10 +78,13 @@ class DriveManager @Inject constructor(
             }
         }
 
-    private fun addCurrentDriveAsDrive(currentRideDataCollector: CurrentRideDataCollector): Long? {
-        return currentRideDataCollector.getAsDrive()?.let {
-            driveRepository.addDrive(it, currentRideDataCollector.getRacePath())
-        }
+    private suspend fun addCurrentDriveAsDrive(currentRideDataCollector: CurrentRideDataCollector): Long? {
+        return driveRepository.addDrive(
+            accountRepository.getId(),
+            currentRideDataCollector.getRacePath(),
+            autoFinish = false,
+            autoStart =  false
+        )
     }
 
     fun isRaceOngoing() = currentRideDataCollector != null

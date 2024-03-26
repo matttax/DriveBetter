@@ -39,4 +39,9 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
     ),
+    bodySmall = TextStyle(
+        fontFamily = tinkoffRegular,
+        fontWeight = FontWeight.Thin,
+        fontSize = 16.sp,
+    ),
 )

@@ -27,20 +27,20 @@ class RidesHistoryViewModel @Inject constructor(
             .flowOn(Dispatchers.IO)
             .onEach { list ->
                 _driversRides.value = list
-                    .filter { it.detectedRole == "driver" }
-                    .map { it.toUiModel() } + mockDriversRides
+                    .filter { it.detectedRole == "водитель" }
+                    .map { it.toUiModel() }
                 _passengerRides.value = list
-                    .filter { it.detectedRole == "passenger" }
-                    .map { it.toUiModel() } + mockPassengerRides
+                    .filter { it.detectedRole == "пассажир" }
+                    .map { it.toUiModel() }
             }.launchIn(viewModelScope)
     }
 
     companion object {
         val mockDriversRides = listOf(
             RideUiModel(1, "March 20, 2024 16:02", "Moscow", 7.8f),
-            RideUiModel(1, "March 20, 2024 16:34", "Moscow", 10f),
-            RideUiModel(1, "March 20, 2024 17:12", "Moscow", 5.3f),
-            RideUiModel(1, "March 20, 2024 17:20", "Moscow", 6.3f)
+            RideUiModel(2, "March 20, 2024 16:34", "Moscow", 10f),
+            RideUiModel(3, "March 20, 2024 17:12", "Moscow", 5.3f),
+            RideUiModel(4, "March 20, 2024 17:20", "Moscow", 6.3f)
         ).reversed()
 
         val mockPassengerRides = listOf(

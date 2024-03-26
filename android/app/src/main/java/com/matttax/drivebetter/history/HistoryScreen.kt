@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
@@ -22,7 +23,10 @@ import com.matttax.drivebetter.ui.common.Title
 import com.matttax.drivebetter.ui.utils.ColorUtils
 
 @Composable
-fun HistoryScreen(viewModel: RidesHistoryViewModel) {
+fun HistoryScreen(
+    viewModel: RidesHistoryViewModel,
+    onItemClick: (Int) -> Unit
+) {
     val driversRides by viewModel.driversRides.collectAsState()
     val passengersRides by viewModel.passengerRides.collectAsState()
     Column {
@@ -39,15 +43,20 @@ fun HistoryScreen(viewModel: RidesHistoryViewModel) {
             ),
             text = "Driver"
         )
-        LazyColumn(
-            modifier = Modifier.padding(7.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(driversRides.size) {
-                RideItem(
-                    ride = driversRides[it],
-                ) { }
+        if (driversRides.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.padding(7.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(driversRides.size) {
+                    RideItem(
+                        ride = driversRides[it],
+                        onClick = onItemClick
+                    )
+                }
             }
+        } else {
+            EmptyList()
         }
         Spacer(Modifier.height(20.dp))
         Text(
@@ -57,16 +66,36 @@ fun HistoryScreen(viewModel: RidesHistoryViewModel) {
             ),
             text = "Passenger"
         )
-        LazyColumn(
-            modifier = Modifier.padding(7.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(passengersRides.size) {
-                RideItem(
-                    ride = passengersRides[it],
-                ) { }
+        if (passengersRides.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.padding(7.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(passengersRides.size) {
+                    RideItem(
+                        ride = passengersRides[it],
+                    ) { }
+                }
             }
+        } else {
+            EmptyList()
         }
+    }
+}
+
+@Composable
+fun EmptyList() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Empty list",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
     }
 }
 
@@ -127,7 +156,7 @@ fun RideItem(
                     }
                 } else {
                     IconButton(
-                        onClick = { /*TODO*/ }
+                        onClick = { onClick(ride.id) }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_account_circle_24),

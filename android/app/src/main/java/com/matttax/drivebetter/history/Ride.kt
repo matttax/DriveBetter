@@ -3,10 +3,6 @@ package com.matttax.drivebetter.history
 import com.google.gson.annotations.SerializedName
 import com.matttax.drivebetter.network.model.Address
 
-data class RideHistoryResponse(
-    val rides: List<Ride>
-)
-
 data class Ride(
     @SerializedName("ride_id")
     val rideId: Int,
@@ -65,7 +61,7 @@ data class Shift(
     val angleChange: Float,
 
     @SerializedName("address")
-    val address: Address,
+    val address: Address
 )
 
 data class Weather(

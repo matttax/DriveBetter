@@ -4,9 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -16,13 +13,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.matttax.drivebetter.ui.utils.ColorUtils
 import com.matttax.drivebetter.R
+import com.matttax.drivebetter.history.RideScreen
 
-enum class NavigationItems(
+enum class BottomNavigationItem(
     val route: String,
     val title: String,
     val iconId: Int
 ) {
-    RIDES(
+    RIDES_HISTORY(
         route = "rides",
         title = "Rides",
         iconId = R.drawable.ic_baseline_car_24
@@ -39,6 +37,25 @@ enum class NavigationItems(
     )
 }
 
+fun BottomNavigationItem.isSelected(route: String): Boolean {
+    return when(this) {
+        BottomNavigationItem.RIDES_HISTORY -> {
+            println(RideNavigationScreen.RidesList.route)
+            println(RideNavigationScreen.RideScreen.route)
+            println(route)
+            RideNavigationScreen.RidesList.route == route || RideNavigationScreen.RideScreen.route == route
+        }
+        else -> this.route == route
+    }.also { println(it) }
+}
+
+sealed class RideNavigationScreen(val route: String) {
+    object RidesList : RideNavigationScreen("rides_list")
+    object RideScreen : RideNavigationScreen("ride_screen/{id}") {
+        fun navigateById(id: Int): String = "ride_screen/$id"
+    }
+}
+
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
@@ -53,18 +70,19 @@ fun BottomNavigationBar(
         NavigationBar(
             containerColor = Color.White
         ) {
-            NavigationItems.values().forEach { item ->
+            BottomNavigationItem.values().forEach { item ->
+                val isSelected = currentRoute?.let { item.isSelected(it) } ?: true
                 NavigationBarItem(
-                    selected = currentRoute == item.route,
+                    selected = isSelected,
                     onClick = {
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
                         }
                     },
-                    label = { BottomItemText(item.title, currentRoute == item.route) },
+                    label = { BottomItemText(item.title, isSelected) },
                     alwaysShowLabel = true,
-                    icon = { BottomIcon(ImageVector.vectorResource(item.iconId), currentRoute == item.route) },
+                    icon = { BottomIcon(ImageVector.vectorResource(item.iconId), isSelected) },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = Color.White
                     )

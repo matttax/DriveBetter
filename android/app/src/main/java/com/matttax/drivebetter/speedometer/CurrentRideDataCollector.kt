@@ -114,22 +114,6 @@ class CurrentRideDataCollector(
 
     fun getRacePath(): List<PathItem> = drivePathBuilder.getRacePath()
 
-    fun getAsDrive(): Drive? {
-        val startLocationNonNull = startLocation ?: return null
-        val endLocationNonNull = lastLocation ?: return null
-        if (lastPingTime == 0L || getTotalTime() < 5L || distance < 5) return null
-        return Drive(
-            startLocation = startLocationNonNull,
-            endLocation = endLocationNonNull,
-            distance = distance,
-            startTime = startTime,
-            endTime = lastPingTime,
-            pauseTime = pauseCalculator.getPausedTime(lastPingTime),
-            topSpeed = topSpeed.toDouble(),
-            path = drivePathBuilder.getRacePath()
-        )
-    }
-
     private fun onInitial(locationTime: Long, currentLat: Double, currentLon: Double) {
         this.startTime = locationTime
         startLocation = LocationPoint(
