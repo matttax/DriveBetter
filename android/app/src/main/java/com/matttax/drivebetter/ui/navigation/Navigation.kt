@@ -13,7 +13,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.matttax.drivebetter.ui.utils.ColorUtils
 import com.matttax.drivebetter.R
-import com.matttax.drivebetter.history.RideScreen
 
 enum class BottomNavigationItem(
     val route: String,

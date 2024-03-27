@@ -1,6 +1,6 @@
 package com.matttax.drivebetter.speedometer
 
-import com.matttax.drivebetter.history.DriveRepository
+import com.matttax.drivebetter.history.data.DriveRepository
 import com.matttax.drivebetter.profile.data.AccountRepository
 import com.matttax.drivebetter.speedometer.location.LocationProvider
 import com.matttax.drivebetter.speedometer.model.DashboardData

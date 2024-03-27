@@ -1,103 +1,16 @@
-package com.matttax.drivebetter.history
+package com.matttax.drivebetter.history.presentation.components.list
 
-import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.matttax.drivebetter.R
+import com.matttax.drivebetter.history.data.model.RideUiModel
 import com.matttax.drivebetter.ui.common.StarRatingBar
-import com.matttax.drivebetter.ui.common.Title
-import com.matttax.drivebetter.ui.utils.ColorUtils
-
-@Composable
-fun HistoryScreen(
-    viewModel: RidesHistoryViewModel,
-    onItemClick: (Int) -> Unit
-) {
-    val driversRides by viewModel.driversRides.collectAsState()
-    val passengersRides by viewModel.passengerRides.collectAsState()
-    Column {
-        Title(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            text = "History",
-        )
-        Text(
-            modifier = Modifier.padding(
-                horizontal = 15.dp,
-                vertical = 2.dp
-            ),
-            text = "Driver"
-        )
-        if (driversRides.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier.padding(7.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(driversRides.size) {
-                    RideItem(
-                        ride = driversRides[it],
-                        onClick = onItemClick
-                    )
-                }
-            }
-        } else {
-            EmptyList()
-        }
-        Spacer(Modifier.height(20.dp))
-        Text(
-            modifier = Modifier.padding(
-                horizontal = 15.dp,
-                vertical = 2.dp
-            ),
-            text = "Passenger"
-        )
-        if (passengersRides.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier.padding(7.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(passengersRides.size) {
-                    RideItem(
-                        ride = passengersRides[it],
-                    ) { }
-                }
-            }
-        } else {
-            EmptyList()
-        }
-    }
-}
-
-@Composable
-fun EmptyList() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Empty list",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
-        )
-    }
-}
 
 @Composable
 fun RideItem(

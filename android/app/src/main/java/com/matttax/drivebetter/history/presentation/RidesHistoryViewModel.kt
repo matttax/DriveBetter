@@ -1,12 +1,14 @@
-package com.matttax.drivebetter.history
+package com.matttax.drivebetter.history.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.matttax.drivebetter.history.data.DriveRepository
+import com.matttax.drivebetter.history.data.model.RideUiModel
+import com.matttax.drivebetter.history.data.model.toUiModel
 import com.matttax.drivebetter.profile.data.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,37 +36,4 @@ class RidesHistoryViewModel @Inject constructor(
                     .map { it.toUiModel() }
             }.launchIn(viewModelScope)
     }
-
-    companion object {
-        val mockDriversRides = listOf(
-            RideUiModel(1, "March 20, 2024 16:02", "Moscow", 7.8f),
-            RideUiModel(2, "March 20, 2024 16:34", "Moscow", 10f),
-            RideUiModel(3, "March 20, 2024 17:12", "Moscow", 5.3f),
-            RideUiModel(4, "March 20, 2024 17:20", "Moscow", 6.3f)
-        ).reversed()
-
-        val mockPassengerRides = listOf(
-            RideUiModel(1, "March 20, 2024 14:12", "Moscow"),
-            RideUiModel(1, "March 20, 2024 16:58", "Moscow")
-        )
-    }
 }
-
-fun Ride.toUiModel(): RideUiModel {
-    return RideUiModel(
-        id = rideId,
-        title = "March 20, 2024 16:02",
-        location = "Moscow",
-        rating = if (detectedRole == "passenger") {
-            (3..9).random() + ((1..9).random() / 10f)
-        } else null
-    )
-}
-
-@Immutable
-data class RideUiModel(
-    val id: Int,
-    val title: String,
-    val location: String,
-    val rating: Float? = null
-)

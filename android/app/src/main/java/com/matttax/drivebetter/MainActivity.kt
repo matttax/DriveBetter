@@ -27,10 +27,10 @@ import androidx.navigation.navArgument
 import com.matttax.drivebetter.drive.presentation.DriveViewModel
 import com.matttax.drivebetter.drive.presentation.DrivingCommand
 import com.matttax.drivebetter.drive.presentation.componenets.DriveScreen
-import com.matttax.drivebetter.history.HistoryScreen
-import com.matttax.drivebetter.history.RideScreen
-import com.matttax.drivebetter.history.RideViewModel
-import com.matttax.drivebetter.history.RidesHistoryViewModel
+import com.matttax.drivebetter.history.presentation.screens.HistoryScreen
+import com.matttax.drivebetter.history.presentation.RideScreen
+import com.matttax.drivebetter.history.presentation.RideViewModel
+import com.matttax.drivebetter.history.presentation.RidesHistoryViewModel
 import com.matttax.drivebetter.profile.presentation.components.ProfileScreen
 import com.matttax.drivebetter.profile.presentation.ProfileViewModel
 import com.matttax.drivebetter.speedometer.background.DriveService

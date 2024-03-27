@@ -1,7 +1,6 @@
 package com.matttax.drivebetter.speedometer
 
 import com.matttax.drivebetter.speedometer.model.CurrentDriveStatus
-import com.matttax.drivebetter.history.Drive
 import com.matttax.drivebetter.speedometer.path.EndForgotCalculator
 import com.matttax.drivebetter.speedometer.model.LocationPoint
 import com.matttax.drivebetter.speedometer.path.PauseCalculator
