@@ -1,16 +1,27 @@
 PODS:
-  - shared (1.0)
+  - shared (1.0):
+    - YandexMapKit
+  - YandexMapKit (3.5.0):
+    - YandexRuntime (= 3.5.0)
+  - YandexRuntime (3.5.0)
 
 DEPENDENCIES:
   - shared (from `../shared`)
+
+SPEC REPOS:
+  trunk:
+    - YandexMapKit
+    - YandexRuntime
 
 EXTERNAL SOURCES:
   shared:
     :path: "../shared"
 
 SPEC CHECKSUMS:
-  shared: 51412128173eacfed701b4fc7a0576c3a34d8bad
+  shared: 59e6fe91398dd5ebdc65ca6b96865ba527af2293
+  YandexMapKit: ecd4b78de34a35df63d066ac299e6fd0fe46d1ba
+  YandexRuntime: 2d55244d06267106cf9b00c25a1e63f72a73b6fd
 
 PODFILE CHECKSUM: 78d6cc1b71b232202c48a29d4e6c34972c534c73
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.8.4

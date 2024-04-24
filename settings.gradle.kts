@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "test"
+rootProject.name = "DriveBetter"
 include(":androidApp")
 include(":shared")

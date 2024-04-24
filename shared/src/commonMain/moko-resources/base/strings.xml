@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+<!--    Authorization-->
+    <string name="unauthorized_message">You\'re not authorized yet</string>
+    <string name="log_in">Log in</string>
+    <string name="sign_up">Sign up</string>
+
+<!--    Months-->
+    <string name="months_january">Jan</string>
+    <string name="months_february">Feb</string>
+    <string name="months_march">March</string>
+    <string name="months_april">April</string>
+    <string name="months_may">May</string>
+    <string name="months_june">Jun</string>
+    <string name="months_july">Jul</string>
+    <string name="months_august">Aug</string>
+    <string name="months_september">Sep</string>
+    <string name="months_october">Oct</string>
+    <string name="months_november">Nov</string>
+    <string name="months_december">Dec</string>
+
+<!--    Ride history-->
+    <string name="ride_history">History</string>
+    <string name="speed">Speed</string>
+    <string name="speed_kph">km/h</string>
+    <string name="max_speed">Max</string>
+    <string name="average_speed">Avg</string>
+    <string name="driving_time">Driving time</string>
+    <string name="driving_daylight_time">Daylight</string>
+    <string name="driving_light_nighttime_time">Light nighttime</string>
+    <string name="driving_nighttime_time">Nighttime</string>
+    <string name="weather">Weather</string>
+    <string name="conditions">Conditions</string>
+    <string name="visibility">Visibility</string>
+    <string name="speeding">Speeding</string>
+    <string name="dangerous_driving">Dangerous driving</string>
+</resources>

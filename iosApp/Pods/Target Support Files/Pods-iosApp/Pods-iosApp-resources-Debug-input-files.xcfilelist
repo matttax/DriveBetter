@@ -1,2 +1,3 @@
 ${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-resources.sh
-${PODS_ROOT}/../../shared/build/compose/ios/shared/compose-resources
+${PODS_ROOT}/YandexMapKit/YandexMapKit.framework/Versions/A/Resources/YandexMapKit.bundle
+${PODS_ROOT}/YandexRuntime/YandexRuntime.framework/Versions/A/Resources/YandexRuntime.bundle

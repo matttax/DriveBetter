@@ -97,10 +97,12 @@ EOM
   esac
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_resource "${PODS_ROOT}/../../shared/build/compose/ios/shared/compose-resources"
+  install_resource "${PODS_ROOT}/YandexMapKit/YandexMapKit.framework/Versions/A/Resources/YandexMapKit.bundle"
+  install_resource "${PODS_ROOT}/YandexRuntime/YandexRuntime.framework/Versions/A/Resources/YandexRuntime.bundle"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_resource "${PODS_ROOT}/../../shared/build/compose/ios/shared/compose-resources"
+  install_resource "${PODS_ROOT}/YandexMapKit/YandexMapKit.framework/Versions/A/Resources/YandexMapKit.bundle"
+  install_resource "${PODS_ROOT}/YandexRuntime/YandexRuntime.framework/Versions/A/Resources/YandexRuntime.bundle"
 fi
 
 mkdir -p "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
@@ -114,7 +116,7 @@ rm -f "$RESOURCES_TO_COPY"
 if [[ -n "${WRAPPER_EXTENSION}" ]] && [ "`xcrun --find actool`" ] && [ -n "${XCASSET_FILES:-}" ]
 then
   # Find all other xcassets (this unfortunately includes those of path pods and other targets).
-  OTHER_XCASSETS=$(find -L "$PWD" -iname "*.xcassets" -type d)
+  OTHER_XCASSETS=$(find "$PWD" -iname "*.xcassets" -type d)
   while read line; do
     if [[ $line != "${PODS_ROOT}*" ]]; then
       XCASSET_FILES+=("$line")
