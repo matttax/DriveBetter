@@ -8,6 +8,7 @@ import com.matttax.drivebetter.profile.data.ProfileLocalDataSource
 import com.matttax.drivebetter.util.provideDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import org.lighthousegames.logging.KmLog
 
 class ProfileLocalDataSourceImpl(
     databaseDriverFactory: DatabaseDriverFactory
@@ -24,7 +25,7 @@ class ProfileLocalDataSourceImpl(
     override suspend fun getById(id: Long): ProfileEntity? {
         return withContext(provideDispatcher().io) {
             database.profileQueries.getById(id).executeAsOneOrNull()
-        }
+        }.also { log.d { "get profile by id $id: $it" } }
     }
 
     override suspend fun getLastId(): Long?{
@@ -52,5 +53,9 @@ class ProfileLocalDataSourceImpl(
         withContext(provideDispatcher().io) {
             database.profileQueries.deleteProfileById(id)
         }
+    }
+
+    companion object {
+        private val log = KmLog("ProfileLocalDataSourceImpl")
     }
 }

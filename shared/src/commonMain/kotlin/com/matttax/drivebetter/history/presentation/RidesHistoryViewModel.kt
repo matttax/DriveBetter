@@ -7,6 +7,7 @@ import com.matttax.drivebetter.history.presentation.model.DangerousDriving
 import com.matttax.drivebetter.history.presentation.model.DangerousDrivingType
 import com.matttax.drivebetter.history.presentation.model.WeatherInterval
 import com.matttax.drivebetter.history.presentation.model.WeatherType
+import com.matttax.drivebetter.profile.data.token.LoginStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,7 +17,8 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class RidesHistoryViewModel(
-    private val rideRepository: RideRepository
+    private val rideRepository: RideRepository,
+    private val loginStorage: LoginStorage
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<RideHistoryState>(RideHistoryState.Loading)
@@ -26,9 +28,14 @@ class RidesHistoryViewModel(
     val currentRide: Ride?
         get() = _currentRide
 
-    fun getRides(uuid: String) {
-        viewModelScope.launch {
-            _viewState.value = RideHistoryState.RidesList(rideRepository.getRideHistoryById(uuid))
+    fun getRides() {
+        if (loginStorage.token == null) {
+            _viewState.value = RideHistoryState.Unauthorized
+        } else {
+            _viewState.value = RideHistoryState.Loading
+            viewModelScope.launch {
+                _viewState.value = RideHistoryState.RidesList(rideRepository.getRideHistoryById(""))
+            }
         }
     }
 

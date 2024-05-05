@@ -20,7 +20,7 @@ fun ProfileEntity.toDomainModel() = ProfileDomainModel(
 fun ProfileDomainModel.toDatabaseEntity(): ProfileEntity? {
     if (!isValid) return null
     return ProfileEntity(
-        id = -1,
+        id = uuid,
         name = name!!,
         city = city!!,
         gender = gender!!.text,

@@ -32,8 +32,8 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        pod("YandexMapKit") {
-            packageName = "YandexMK"
+        pod("YandexMapsMobile") {
+            version = "= 4.0.0-full"
         }
     }
     
@@ -75,6 +75,9 @@ kotlin {
                 implementation(libs.aay.chart)
                 implementation(libs.moko.resources)
                 implementation(libs.moko.resources.compose)
+                api(libs.moko.geo)
+                api(libs.moko.geo.compose)
+                api(libs.lighthouse.logging)
             }
         }
         val iosX64Main by getting

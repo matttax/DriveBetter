@@ -1,10 +1,12 @@
 package com.matttax.drivebetter.profile.domain.model
 
+import com.matttax.drivebetter.profile.data.AccountIdProvider
 import com.matttax.drivebetter.profile.domain.util.DateConverter
 import com.matttax.drivebetter.profile.domain.util.DateConverter.asString
 import kotlinx.datetime.LocalDate
 
 data class ProfileDomainModel(
+    val uuid: Long = AccountIdProvider.newId(),
     val name: String? = null,
     val gender: Gender? = null,
     val city: String? = null,

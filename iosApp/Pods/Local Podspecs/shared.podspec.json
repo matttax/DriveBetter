@@ -14,8 +14,8 @@
     "ios": "16.0"
   },
   "dependencies": {
-    "YandexMapKit": [
-
+    "YandexMapsMobile": [
+      "= 4.0.0-full"
     ]
   },
   "pod_target_xcconfig": {

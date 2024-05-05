@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import org.lighthousegames.logging.KmLog
 
 class ProfileViewModel(
     private val repository: ProfileRepository
@@ -26,7 +27,7 @@ class ProfileViewModel(
         when(viewEvent) {
             is ProfileEvent.FetchState -> fetchState()
             is ProfileEvent.LogIn -> _viewState.value = AuthState.LoggingIn
-            is ProfileEvent.LogOut -> _viewState.value = AuthState.Unauthorized
+            is ProfileEvent.LogOut -> logOut()
             is ProfileEvent.SignUp -> _viewState.value = AuthState.Registration
             is ProfileEvent.AbortAuthorization -> _viewState.value = AuthState.Unauthorized
             is ProfileEvent.CreateProfile -> createProfile(viewEvent)
@@ -48,17 +49,36 @@ class ProfileViewModel(
 
     private fun createProfile(request: ProfileEvent.CreateProfile) {
         viewModelScope.launch {
-            repository.signUp(request)
+            if (repository.signUp(request)) {
+                log.d { "logging in..." }
+                _viewState.value = AuthState.LoggedIn(request.profile)
+            } else {
+                log.d { "log in error" }
+            }
         }
     }
 
     private fun enterProfile(request: ProfileEvent.EnterProfile) {
         viewModelScope.launch {
-            repository.logIn(request)
+            if (repository.logIn(request)) {
+                log.d { "logging in..." }
+//                _viewState.value = AuthState.LoggedIn(request.profile)
+            } else {
+                log.d { "log in error" }
+            }
         }
     }
 
     private fun editProfile(profile: ProfileDomainModel) {
 
+    }
+
+    private fun logOut() {
+        repository.logOut()
+        _viewState.value = AuthState.Unauthorized
+    }
+
+    companion object {
+        private val log = KmLog("ProfileViewModel")
     }
 }

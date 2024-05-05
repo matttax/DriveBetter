@@ -18,17 +18,7 @@
 			<key>License</key>
 			<string>Proprietary</string>
 			<key>Title</key>
-			<string>YandexMapKit</string>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-		</dict>
-		<dict>
-			<key>FooterText</key>
-			<string>https://yandex.ru/legal/maps_api/ 2016 © Yandex. All rights reserved.</string>
-			<key>License</key>
-			<string>Proprietary</string>
-			<key>Title</key>
-			<string>YandexRuntime</string>
+			<string>YandexMapsMobile</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>

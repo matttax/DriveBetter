@@ -23,6 +23,8 @@ datetime = "0.6.0-RC.2"
 multiplatformSettings = "1.1.1"
 charts = "Beta-0.0.5"
 resources = "0.24.0-beta-1"
+mokoGeo = "0.6.0"
+logging = "1.4.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -67,6 +69,11 @@ aay-chart = { module = "io.github.thechance101:chart", version.ref = "charts" }
 
 moko-resources = { module = "dev.icerock.moko:resources", version.ref = "resources" }
 moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "resources" }
+
+moko-geo = { module =  "dev.icerock.moko:geo", version.ref = "mokoGeo" }
+moko-geo-compose = { module = "dev.icerock.moko:geo-compose", version.ref = "mokoGeo" }
+
+lighthouse-logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

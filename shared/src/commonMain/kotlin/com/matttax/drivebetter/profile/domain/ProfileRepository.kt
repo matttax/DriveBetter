@@ -10,4 +10,6 @@ interface ProfileRepository {
     suspend fun logIn(request: ProfileEvent.EnterProfile): Boolean
 
     suspend fun signUp(request: ProfileEvent.CreateProfile): Boolean
+
+    fun logOut()
 }
