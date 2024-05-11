@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.sqlDelight)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.multiplatformResources)
 }
@@ -45,7 +44,6 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.maps.mobile)
                 implementation(libs.accompanist.permissions)
-                implementation(libs.sqldelight.android)
             }
         }
         val commonMain by getting {
@@ -68,8 +66,6 @@ kotlin {
                 implementation(libs.compose.material.dialogs)
                 api(libs.koin.core)
                 implementation(libs.koin.compose)
-                implementation(libs.sqldelight.coroutines)
-                implementation(libs.sqldelight.runtime)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.settings.multiplatform)
                 implementation(libs.aay.chart)
@@ -90,7 +86,6 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.ktor.client.darwin)
-                implementation(libs.sqldelight.ios)
             }
         }
     }
@@ -137,14 +132,6 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
-    }
-}
-
-sqldelight {
-    databases {
-        create(name = "AccountDatabase") {
-            packageName.set("com.matttax.drivebetter")
-        }
     }
 }
 

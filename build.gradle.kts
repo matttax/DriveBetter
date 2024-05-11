@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform).apply(false)
     alias(libs.plugins.kotlinCocoapods).apply(false)
     alias(libs.plugins.jetbrainsCompose).apply(false)
-    alias(libs.plugins.sqlDelight).apply(false)
     alias(libs.plugins.kotlinxSerialization).apply(false)
     alias(libs.plugins.multiplatformResources).apply(false)
 }

@@ -4,13 +4,8 @@ import com.matttax.drivebetter.KtorService
 import com.matttax.drivebetter.history.data.RideRepositoryImpl
 import com.matttax.drivebetter.history.domain.RideRepository
 import com.matttax.drivebetter.history.presentation.RidesHistoryViewModel
-import com.matttax.drivebetter.map.location.DefaultLocationTracker
 import com.matttax.drivebetter.map.presentation.MapViewModel
-import com.matttax.drivebetter.map.search.SearchManagerFacade
-import com.matttax.drivebetter.profile.data.cache.DatabaseDriverFactory
-import com.matttax.drivebetter.profile.data.ProfileLocalDataSource
 import com.matttax.drivebetter.profile.data.ProfileRemoteDataSource
-import com.matttax.drivebetter.profile.data.cache.ProfileLocalDataSourceImpl
 import com.matttax.drivebetter.profile.data.ProfileRepositoryImpl
 import com.matttax.drivebetter.profile.data.network.ProfileRemoteDataSourceImpl
 import com.matttax.drivebetter.profile.data.token.LoginStorage
@@ -46,7 +41,7 @@ private fun dataModule() = module {
 
     factory<ProfileRepository> {
         ProfileRepositoryImpl(
-            profileLocalDataSource = get(),
+//            profileLocalDataSource = get(),
             profileRemoteDataSource = get(),
             loginStorage = get(),
         )
@@ -62,15 +57,15 @@ private fun dataModule() = module {
         LoginStorageImpl()
     }
 
-    single<ProfileLocalDataSource> {
-        ProfileLocalDataSourceImpl(
-            databaseDriverFactory = get()
-        )
-    }
-
-    single {
-        DatabaseDriverFactory()
-    }
+//    single<ProfileLocalDataSource> {
+//        ProfileLocalDataSourceImpl(
+//            databaseDriverFactory = get()
+//        )
+//    }
+//
+//    single {
+//        DatabaseDriverFactory()
+//    }
 
     single {
         KtorService()

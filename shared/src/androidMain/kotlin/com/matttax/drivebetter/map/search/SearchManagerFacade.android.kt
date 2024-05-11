@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.lighthousegames.logging.KmLog
 
 actual class SearchManagerFacade actual constructor() {
 
@@ -26,6 +27,7 @@ actual class SearchManagerFacade actual constructor() {
         get() = _searchResults.asStateFlow()
 
     actual fun submit(query: String, topLeftPoint: GeoPoint, bottomRightPoint: GeoPoint) {
+        log.d { "query submitted: $query" }
         searchManager.submit(
             query,
             Geometry.fromBoundingBox(
@@ -50,15 +52,20 @@ actual class SearchManagerFacade actual constructor() {
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
+            log.d { "search response: ${response.metadata.found} found" }
             _searchResults.update {
                 Result.success(
                     response.collection.children
                         .mapNotNull { it.obj?.toSearchItem() }
+                        .also {
+                            log.d { "search response: $it" }
+                        }
                 )
             }
         }
 
         override fun onSearchError(error: Error) {
+            log.e { "search error, ${error::class.simpleName}" }
             _searchResults.update {
                 Result.failure(Exception(error::class.simpleName))
             }
@@ -72,5 +79,9 @@ actual class SearchManagerFacade actual constructor() {
                 it, name, descriptionText
             )
         }
+    }
+
+    companion object {
+        private val log = KmLog("SearchManagerFacade")
     }
 }

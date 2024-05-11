@@ -34,4 +34,6 @@
     <string name="visibility">Visibility</string>
     <string name="speeding">Speeding</string>
     <string name="dangerous_driving">Dangerous driving</string>
+
+    <string name="search">Search</string>
 </resources>

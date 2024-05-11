@@ -18,7 +18,6 @@ koinCompose = "1.0.4"
 composeDialogs = "0.9.5"
 accompanistPermissions = "0.34.0"
 kamel = "0.9.4"
-sqlDelight = "2.0.2"
 datetime = "0.6.0-RC.2"
 multiplatformSettings = "1.1.1"
 charts = "Beta-0.0.5"
@@ -57,10 +56,6 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 
 kamel = { module = "media.kamel:kamel-image", version.ref = "kamel" }
 
-sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
-sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
-sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
-sqldelight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 settings-multiplatform = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
@@ -82,6 +77,5 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 multiplatformResources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "resources" }

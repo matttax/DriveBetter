@@ -1,8 +1,11 @@
 package com.matttax.drivebetter.profile.data.token
 
+import com.matttax.drivebetter.profile.domain.model.ProfileDomainModel
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.lighthousegames.logging.KmLog
 
 class LoginStorageImpl : LoginStorage {
@@ -16,11 +19,12 @@ class LoginStorageImpl : LoginStorage {
             log.d { "token saved: $token" }
         }
 
-    override var profileId: Long?
-        get() = settings[StorageKeys.PROFILE_ID.key]
+    override var lastProfile: ProfileDomainModel?
+        get() = settings[StorageKeys.PROFILE_DATA.key]
         set(value) {
-            settings[StorageKeys.PROFILE_ID.key] = value
-            log.d { "profileId saved: $profileId" }
+            settings[StorageKeys.PROFILE_DATA.key] =
+                Json.encodeToString(value)
+            log.d { "profileId saved: $lastProfile" }
         }
 
     override fun clear() {
