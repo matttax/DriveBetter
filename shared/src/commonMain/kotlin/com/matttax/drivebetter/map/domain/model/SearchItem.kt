@@ -1,4 +1,4 @@
-package com.matttax.drivebetter.map.domain
+package com.matttax.drivebetter.map.domain.model
 
 data class SearchItem(
     val point: GeoPoint,

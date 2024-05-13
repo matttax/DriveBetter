@@ -3,7 +3,7 @@ package com.matttax.drivebetter.profile.data.network
 import com.matttax.drivebetter.KtorService
 import com.matttax.drivebetter.profile.data.ProfileRemoteDataSource
 import com.matttax.drivebetter.profile.domain.model.ProfileDomainModel
-import com.matttax.drivebetter.util.provideDispatcher
+import com.matttax.drivebetter.coroutines.provideDispatcher
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

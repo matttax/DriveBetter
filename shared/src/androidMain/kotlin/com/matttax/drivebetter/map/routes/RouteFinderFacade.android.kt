@@ -28,18 +28,14 @@ actual class RouteFinderFacade actual constructor() {
     }
     private val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
         override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
-            log.d {
-                drivingRoutes.last().geometry.points
-                    .map { "${it.latitude} ${it.longitude}" }
-            }
             _routes.update {
                 Result.success(
                     drivingRoutes.map { drivingRoute ->
                         Route(
                             metadata = RouteMetadata(
-                                distance = drivingRoute.metadata.weight.distance.value,
-                                timeSec = drivingRoute.metadata.weight.time.value,
-                                timeWithTrafficSec = drivingRoute.metadata.weight.timeWithTraffic.value,
+                                distance = drivingRoute.metadata.weight.distance.text,
+                                time = drivingRoute.metadata.weight.time.text,
+                                timeWithTraffic = drivingRoute.metadata.weight.timeWithTraffic.text,
                                 railwayCrossingCount = drivingRoute.railwayCrossings.size,
                                 pedestrianCrossingCount = drivingRoute.pedestrianCrossings.size
                             ),
@@ -52,7 +48,11 @@ actual class RouteFinderFacade actual constructor() {
         }
 
         override fun onDrivingRoutesError(error: Error) {
-            log.d { error.javaClass.name }
+            val message = error.javaClass.name
+            log.e { message }
+            _routes.update {
+                Result.failure(RuntimeException(message))
+            }
         }
     }
 

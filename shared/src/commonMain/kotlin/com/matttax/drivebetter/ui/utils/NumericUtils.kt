@@ -17,4 +17,8 @@ object NumericUtils {
     fun Float.toPercentage(): String {
         return "${toRoundedString()}%"
     }
+
+    fun Float.ifZero(then: Float): Float {
+        return if (equals(0)) then else this
+    }
 }

@@ -14,8 +14,9 @@ import cocoapods.YandexMapsMobile.YMKSearchOptions
 import cocoapods.YandexMapsMobile.YMKSearchSearchManagerType
 import cocoapods.YandexMapsMobile.YMKVisibleRegion
 import cocoapods.YandexMapsMobile.YMKVisibleRegionUtils
-import com.matttax.drivebetter.map.domain.GeoPoint
-import com.matttax.drivebetter.map.domain.SearchItem
+import com.matttax.drivebetter.map.domain.model.RidePoint
+import com.matttax.drivebetter.map.domain.model.SearchItem
+import com.matttax.drivebetter.map.presentation.states.MapViewState
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,8 +24,9 @@ import kotlinx.coroutines.flow.StateFlow
 @OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun YandexMapView(
-    locationFlow: StateFlow<GeoPoint?>,
+    locationFlow: StateFlow<RidePoint?>,
     selectedItemFlow: StateFlow<SearchItem?>,
+    selectedPolyline: StateFlow<Any?>,
     searchResultsFlow: Flow<List<SearchItem>>,
     onCreate: () -> Unit,
     onUpdate: (MapViewState) -> Unit,

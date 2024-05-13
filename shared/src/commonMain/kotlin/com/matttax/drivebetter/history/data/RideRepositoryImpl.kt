@@ -4,7 +4,7 @@ import com.matttax.drivebetter.KtorService
 import com.matttax.drivebetter.history.domain.RideRepository
 import com.matttax.drivebetter.history.domain.model.Ride
 import kotlinx.coroutines.withContext
-import com.matttax.drivebetter.util.provideDispatcher
+import com.matttax.drivebetter.coroutines.provideDispatcher
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 

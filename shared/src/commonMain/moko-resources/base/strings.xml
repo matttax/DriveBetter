@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
 <!--    Authorization-->
-    <string name="unauthorized_message">You\'re not authorized yet</string>
+    <string name="unauthorized_message">You are not authorized yet</string>
     <string name="log_in">Log in</string>
     <string name="sign_up">Sign up</string>
 
@@ -35,5 +35,14 @@
     <string name="speeding">Speeding</string>
     <string name="dangerous_driving">Dangerous driving</string>
 
+<!--    Map-->
     <string name="search">Search</string>
+    <string name="distance">Distance</string>
+    <string name="time">Time</string>
+    <string name="time_with_traffic">Time with traffic</string>
+    <string name="railway_crossing_count">Railway crossings</string>
+    <string name="pedestrian_crossing_count">Pedestrian crossings</string>
+    <string name="start_ride">Start ride</string>
+    <string name="no_routes">No routes found</string>
+
 </resources>

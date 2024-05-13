@@ -1,28 +1,30 @@
 package com.matttax.drivebetter.map.presentation
 
-import com.matttax.drivebetter.map.MapViewState
-import com.matttax.drivebetter.map.domain.GeoPoint
-import com.matttax.drivebetter.map.domain.SearchItem
+import com.matttax.drivebetter.map.domain.model.Azimuth
+import com.matttax.drivebetter.map.domain.model.GeoPoint
+import com.matttax.drivebetter.map.domain.model.RidePoint
+import com.matttax.drivebetter.map.domain.model.SearchItem
+import com.matttax.drivebetter.map.domain.model.Speed
+import com.matttax.drivebetter.map.presentation.states.MapViewState
+import com.matttax.drivebetter.map.presentation.states.RouteState
+import com.matttax.drivebetter.map.presentation.states.SearchState
 import com.matttax.drivebetter.map.routes.RouteFinderFacade
 import com.matttax.drivebetter.map.routes.RouteSearchRequest
-import com.matttax.drivebetter.map.routes.model.Route
 import com.matttax.drivebetter.map.search.SearchManagerFacade
+import com.matttax.drivebetter.ui.utils.NumericUtils.ifZero
+import com.matttax.drivebetter.coroutines.provideDispatcher
 import dev.icerock.moko.geo.LatLng
 import dev.icerock.moko.geo.LocationTracker
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.lighthousegames.logging.KmLog
-import kotlin.jvm.JvmInline
 
 class MapViewModel : ViewModel() {
 
@@ -32,26 +34,23 @@ class MapViewModel : ViewModel() {
     lateinit var locationTracker: LocationTracker
         private set
 
-    private val currentRidePoint = MutableStateFlow<RidePoint?>(null)
-    val currentLocation = currentRidePoint
-        .map { it?.location }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    private val _currentRidePoint = MutableStateFlow<RidePoint?>(null)
+    val currentRidePoint: StateFlow<RidePoint?> get() = _currentRidePoint
 
     private val _searchText = MutableStateFlow("")
-    val searchText: StateFlow<String>
-        get() = _searchText
+    val searchText: StateFlow<String> get() = _searchText
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.NoSearch)
-    val searchState: StateFlow<SearchState>
-        get() = _searchState
+    val searchState: StateFlow<SearchState> get() = _searchState
 
     private val _routeState = MutableStateFlow<RouteState>(RouteState.NoSearch)
-    val routeState: StateFlow<RouteState>
-        get() = _routeState
+    val routeState: StateFlow<RouteState> get() = _routeState
 
     private val _selectedDestination = MutableStateFlow<SearchItem?>(null)
-    val selectedDestination: StateFlow<SearchItem?>
-        get() = _selectedDestination
+    val selectedDestination: StateFlow<SearchItem?> get() = _selectedDestination
+
+    private val _selectedPolyline = MutableStateFlow<Any?>(null)
+    val selectedPolyline: StateFlow<Any?> get() = _selectedPolyline
 
     private val mapState = MutableStateFlow<MapViewState?>(null)
 
@@ -75,7 +74,7 @@ class MapViewModel : ViewModel() {
             mapState.value?.let {
                 GeoPoint(it.targetPoint.latitude - delta, it.targetPoint.longitude - delta) to
                         GeoPoint(it.targetPoint.latitude + delta, it.targetPoint.longitude + delta)
-            } ?: currentLocation.value?.let {
+            } ?: currentRidePoint.value?.location?.let {
                 GeoPoint(it.latitude - delta, it.longitude - delta) to
                         GeoPoint(it.latitude + delta, it.longitude + delta)
             } ?: run {
@@ -100,14 +99,27 @@ class MapViewModel : ViewModel() {
     fun onDestinationSelected(searchItem: SearchItem) {
         _selectedDestination.value = searchItem
         _routeState.value = RouteState.Loading
-        currentLocation.value?.let {
+        currentRidePoint.value?.let {
             routeFinderFacade.submitRequest(
                 RouteSearchRequest(
-                    from = it,
+                    from = it.location,
                     to = searchItem.point
                 )
             )
         }
+    }
+
+    fun onPolylineSelected(polyline: Any) {
+        _selectedPolyline.value = polyline
+    }
+
+    fun refreshRoutes() {
+        _routeState.value = RouteState.Loading
+        routeFinderFacade.refresh()
+    }
+
+    fun clearPolyline() {
+        _selectedPolyline.value = null
     }
 
     fun onClearDestination() {
@@ -142,14 +154,16 @@ class MapViewModel : ViewModel() {
     private fun observeLocation() {
         locationTracker.getExtendedLocationsFlow()
             .onEach { extLoc ->
-                currentRidePoint.update {
+                _currentRidePoint.update {
                     RidePoint(
                         location = extLoc.location.coordinates.toGeoPoint(),
                         speed = Speed(extLoc.speed.speedMps),
                         azimuth = Azimuth(extLoc.azimuth.azimuthDegrees)
                     )
                 }
-            }.launchIn(viewModelScope)
+            }
+            .flowOn(provideDispatcher().io)
+            .launchIn(viewModelScope)
     }
 
     private fun observeSearchResults() {
@@ -183,53 +197,7 @@ fun LatLng.toGeoPoint() = GeoPoint(
     latitude, longitude
 )
 
-@JvmInline
-value class Speed(
-    val speed: Double
-)
-
-@JvmInline
-value class Azimuth(
-    val azimuth: Double
-)
-
-data class RidePoint(
-    val location: GeoPoint,
-    val speed: Speed = Speed(0.0),
-    val azimuth: Azimuth = Azimuth(0.0),
-    val timestamp: Long = Clock.System.now().toEpochMilliseconds()
-)
-
-sealed interface SearchState {
-
-    data object NoSearch : SearchState
-
-    data object Loading : SearchState
-
-    data object Empty : SearchState
-
-    data class Error(val message: String) : SearchState
-
-    data class Results(val list: List<SearchItem>) : SearchState
-}
-
-sealed interface RouteState {
-
-    data object NoSearch : RouteState
-
-    data object Loading : RouteState
-
-    data object Empty : RouteState
-
-    data class Error(val message: String) : RouteState
-
-    data class Results(val list: List<Route>) : RouteState
-}
-
-fun Float.ifZero(then: Float): Float {
-    return if (equals(0)) then else this
-}
-
 fun MapViewState.getDelta(): Float {
     return 20f / zoom.ifZero(1f)
 }
+

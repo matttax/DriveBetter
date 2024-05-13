@@ -19,7 +19,7 @@ import com.matttax.drivebetter.profile.presentation.avatar.rememberCameraManager
 import com.matttax.drivebetter.profile.presentation.avatar.rememberGalleryManager
 import com.matttax.drivebetter.profile.presentation.componenets.screens.ImageSourceOptionDialog
 import com.matttax.drivebetter.ui.utils.StringUtils
-import com.matttax.drivebetter.util.provideDispatcher
+import com.matttax.drivebetter.coroutines.provideDispatcher
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState

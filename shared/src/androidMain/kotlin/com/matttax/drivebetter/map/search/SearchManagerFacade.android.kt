@@ -1,7 +1,7 @@
 package com.matttax.drivebetter.map.search
 
-import com.matttax.drivebetter.map.domain.GeoPoint
-import com.matttax.drivebetter.map.domain.SearchItem
+import com.matttax.drivebetter.map.domain.model.GeoPoint
+import com.matttax.drivebetter.map.domain.model.SearchItem
 import com.matttax.drivebetter.map.toGeoPoint
 import com.matttax.drivebetter.map.toMapkitPoint
 import com.yandex.mapkit.GeoObject
@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.lighthousegames.logging.KmLog
+import java.lang.RuntimeException
 
 actual class SearchManagerFacade actual constructor() {
 
@@ -65,9 +66,10 @@ actual class SearchManagerFacade actual constructor() {
         }
 
         override fun onSearchError(error: Error) {
-            log.e { "search error, ${error::class.simpleName}" }
+            val message = error::class.simpleName
+            log.e { "search error, $message" }
             _searchResults.update {
-                Result.failure(Exception(error::class.simpleName))
+                Result.failure(RuntimeException(message))
             }
         }
     }

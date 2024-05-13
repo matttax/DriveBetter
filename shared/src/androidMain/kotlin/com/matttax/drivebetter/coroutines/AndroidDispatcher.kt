@@ -1,4 +1,4 @@
-package com.matttax.drivebetter.util
+package com.matttax.drivebetter.coroutines
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

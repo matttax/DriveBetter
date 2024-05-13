@@ -1,8 +1,9 @@
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.matttax.drivebetter.history.presentation.componenets.HistoryScreen
@@ -22,7 +23,6 @@ import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.navigation.transition.NavTransition
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun NavigatorApp() {
@@ -34,11 +34,13 @@ fun NavigatorApp() {
         val ridesHistoryViewModel = koinViewModel(vmClass = RidesHistoryViewModel::class)
         val mapViewModel = koinViewModel(vmClass = MapViewModel::class)
         mapViewModel.setLocationTracker(locationTrackerFactory.createLocationTracker())
+        val snackbarHostState = remember { SnackbarHostState() }
         AppTheme {
             val navigator = rememberNavigator()
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
-                bottomBar = { BottomNavigationBar(navigator) }
+                bottomBar = { BottomNavigationBar(navigator) },
+                snackbarHost = { SnackbarHost(snackbarHostState) }
             ) { padding ->
                 val defaultModifier = remember {
                     Modifier
@@ -65,7 +67,10 @@ fun NavigatorApp() {
                         route = BottomNavigationItem.MAP.route,
                         navTransition = NavTransition(),
                     ) {
-                        MapView(mapViewModel)
+                        MapView(
+                            mapViewModel = mapViewModel,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
                     scene(
                         route = BottomNavigationItem.RIDES_HISTORY.route,

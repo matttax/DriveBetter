@@ -8,20 +8,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.matttax.drivebetter.R
-import com.matttax.drivebetter.map.domain.GeoPoint
-import com.matttax.drivebetter.map.domain.SearchItem
+import com.matttax.drivebetter.map.domain.model.GeoPoint
+import com.matttax.drivebetter.map.domain.model.RidePoint
+import com.matttax.drivebetter.map.domain.model.SearchItem
+import com.matttax.drivebetter.map.domain.model.isCloseTo
+import com.matttax.drivebetter.map.presentation.mapkit.CameraManager
+import com.matttax.drivebetter.map.presentation.states.MapViewState
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
@@ -32,8 +40,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 actual fun YandexMapView(
-    locationFlow: StateFlow<GeoPoint?>,
+    locationFlow: StateFlow<RidePoint?>,
     selectedItemFlow: StateFlow<SearchItem?>,
+    selectedPolyline: StateFlow<Any?>,
     searchResultsFlow: Flow<List<SearchItem>>,
     onCreate: () -> Unit,
     onUpdate: (MapViewState) -> Unit,
@@ -56,9 +65,11 @@ actual fun YandexMapView(
     val pointIconProvider = remember { ImageProvider.fromBitmap(R.drawable.baseline_location_pin_24.getBitmap(context)) }
     val selectedPointIconProvider = remember { ImageProvider.fromBitmap(R.drawable.baseline_location_pin_selected_24.getBitmap(context)) }
     val locationPointProvider = remember { ImageProvider.fromBitmap(R.drawable.baseline_circle_24.getBitmap(context)) }
-    val location by locationFlow.collectAsState()
+    val ridePoint by locationFlow.collectAsState()
     val selectedResult by selectedItemFlow.collectAsState()
     val results by searchResultsFlow.collectAsState(emptyList())
+    val polyline by selectedPolyline.collectAsState()
+    var previousLocation by remember { mutableStateOf<GeoPoint?>(null) }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
@@ -93,8 +104,10 @@ actual fun YandexMapView(
                 removeCameraListener(cameraListener)
                 addCameraListener(cameraListener)
                 mapObjects.clear()
-//                move(MapWindowProvider.get(location))
-                location?.toMapkitPoint()?.let { point ->
+                if (ridePoint?.location?.isCloseTo(previousLocation)?.not() == true) {
+                    move(CameraManager.getPosition(ridePoint).toCameraPosition())
+                }
+                ridePoint?.location?.toMapkitPoint()?.let { point ->
                     mapObjects.addPlacemark().apply {
                         geometry = point
                         setIcon(locationPointProvider)
@@ -107,14 +120,14 @@ actual fun YandexMapView(
                             setIcon(
                                 selectedPointIconProvider,
                                 IconStyle().apply {
-                                    scale = 3f
+                                    scale = 2f
                                 }
                             )
                         } else {
                             setIcon(
                                 pointIconProvider,
                                 IconStyle().apply {
-                                    scale = 2f
+                                    scale = 1.5f
                                 }
                             )
                         }
@@ -124,7 +137,16 @@ actual fun YandexMapView(
                         }
                     }
                 }
+                (polyline as? Polyline)?.let { line ->
+                    mapObjects.addPolyline(line).apply {
+                        strokeWidth = 5f
+                        outlineWidth = 1f
+                        outlineColor = ContextCompat.getColor(context, R.color.black)
+                        setStrokeColor(ContextCompat.getColor(context, R.color.blue))
+                    }
+                }
             }
+            previousLocation = ridePoint?.location
         }
     )
 }
@@ -137,28 +159,9 @@ fun GeoPoint.toMapkitPoint() = Point(
     latitude, longitude
 )
 
-object MapWindowProvider {
-
-    fun get(location: GeoPoint?): CameraPosition {
-        return if (location == null) {
-            CameraPosition(
-                RUSSIA_CENTER_POINT,
-                0.0f,
-                0.0f,
-                0.0f
-            )
-        } else {
-            CameraPosition(
-                location.toMapkitPoint(),
-                15.0f,
-                0.0f,
-                0.0f
-            )
-        }
-    }
-
-    private val RUSSIA_CENTER_POINT = Point(60.0, 60.0)
-}
+fun MapViewState.toCameraPosition() = CameraPosition(
+    targetPoint.toMapkitPoint(), azimuth, tilt, zoom
+)
 
 private fun Int.getBitmap(context: Context): Bitmap {
     return (ResourcesCompat.getDrawable(context.resources, this, null) as VectorDrawable).toBitmap()
