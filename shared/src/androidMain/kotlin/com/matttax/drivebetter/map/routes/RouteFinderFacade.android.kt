@@ -24,7 +24,7 @@ actual class RouteFinderFacade actual constructor() {
     private val drivingRouter = DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED)
     private val vehicleOptions = VehicleOptions()
     private val drivingOptions = DrivingOptions().apply {
-        routesCount = 7
+        routesCount = 12
     }
     private val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
         override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {

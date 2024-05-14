@@ -48,7 +48,7 @@ actual class SearchManagerFacade actual constructor() {
 
     private val searchOptions = SearchOptions().apply {
         searchTypes = SearchType.BIZ.value
-        resultPageSize = 32
+        resultPageSize = 64
     }
 
     private val searchSessionListener = object : Session.SearchListener {
