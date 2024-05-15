@@ -24,6 +24,14 @@ object DateUtils {
         return "${hour.twoDigits()}:${minute.twoDigits()}"
     }
 
+    fun secondsToTimeString(seconds: Int): String {
+        return when {
+            seconds < 0 -> throw IllegalArgumentException("Time cannot be negative")
+            seconds < 60 -> "00:" + seconds.twoDigits()
+            else -> (seconds / 60).twoDigits() + ":" + (seconds % 60).twoDigits()
+        }
+    }
+
     private fun Int.twoDigits(): String {
         return if (this < 10) "0$this" else this.toString()
     }

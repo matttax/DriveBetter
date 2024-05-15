@@ -43,6 +43,7 @@ actual fun YandexMapView(
     locationFlow: StateFlow<RidePoint?>,
     selectedItemFlow: StateFlow<SearchItem?>,
     selectedPolyline: StateFlow<Any?>,
+    isDrivingFlow: StateFlow<Boolean>,
     searchResultsFlow: Flow<List<SearchItem>>,
     onCreate: () -> Unit,
     onUpdate: (MapViewState) -> Unit,
@@ -53,6 +54,7 @@ actual fun YandexMapView(
     val selectedResult by selectedItemFlow.collectAsState()
     val results by searchResultsFlow.collectAsState(emptyList())
     val polyline by selectedPolyline.collectAsState()
+    val driving by isDrivingFlow.collectAsState()
     var previousLocation by remember { mutableStateOf<GeoPoint?>(null) }
     val cameraListener = remember {
         object : NSObject(), YMKMapCameraListenerProtocol {
@@ -84,7 +86,18 @@ actual fun YandexMapView(
             it.mapWindow?.map?.apply {
                 mapObjects.clear()
                 if (ridePoint?.location?.isCloseTo(previousLocation)?.not() == true) {
-                    moveWithCameraPosition(CameraManager.getPosition(ridePoint).toCameraPosition())
+                    moveWithCameraPosition(CameraManager.getPosition(ridePoint, driving).toCameraPosition())
+                }
+                if (driving) {
+                    setScrollGesturesEnabled(false)
+                    setRotateGesturesEnabled(false)
+                    setTiltGesturesEnabled(false)
+                    setZoomGesturesEnabled(false)
+                } else {
+                    setScrollGesturesEnabled(true)
+                    setRotateGesturesEnabled(true)
+                    setTiltGesturesEnabled(true)
+                    setZoomGesturesEnabled(true)
                 }
                 ridePoint?.location?.toMapkitPoint()?.let { point ->
                     mapObjects.addCircleWithCircle(

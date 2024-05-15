@@ -27,6 +27,7 @@ import com.matttax.drivebetter.map.domain.model.SearchItem
 import com.matttax.drivebetter.map.domain.model.isCloseTo
 import com.matttax.drivebetter.map.presentation.mapkit.CameraManager
 import com.matttax.drivebetter.map.presentation.states.MapViewState
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.geometry.Polyline
@@ -43,6 +44,7 @@ actual fun YandexMapView(
     locationFlow: StateFlow<RidePoint?>,
     selectedItemFlow: StateFlow<SearchItem?>,
     selectedPolyline: StateFlow<Any?>,
+    isDrivingFlow: StateFlow<Boolean>,
     searchResultsFlow: Flow<List<SearchItem>>,
     onCreate: () -> Unit,
     onUpdate: (MapViewState) -> Unit,
@@ -69,6 +71,7 @@ actual fun YandexMapView(
     val selectedResult by selectedItemFlow.collectAsState()
     val results by searchResultsFlow.collectAsState(emptyList())
     val polyline by selectedPolyline.collectAsState()
+    val isDriving by isDrivingFlow.collectAsState()
     var previousLocation by remember { mutableStateOf<GeoPoint?>(null) }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -98,57 +101,70 @@ actual fun YandexMapView(
         factory = {
             onCreate()
             mapView
-        },
-        update = {
-            it.mapWindow.map.apply {
-                removeCameraListener(cameraListener)
-                addCameraListener(cameraListener)
-                mapObjects.clear()
-                if (ridePoint?.location?.isCloseTo(previousLocation)?.not() == true) {
-                    move(CameraManager.getPosition(ridePoint).toCameraPosition())
+        }
+    ) {
+        it.mapWindow.map.apply {
+            removeCameraListener(cameraListener)
+            addCameraListener(cameraListener)
+            mapObjects.clear()
+            if (ridePoint?.location?.isCloseTo(previousLocation)?.not() == true || isDriving) {
+                move(
+                    CameraManager.getPosition(ridePoint, isDriving).toCameraPosition(),
+                    Animation(Animation.Type.LINEAR, 1f)
+                ) {}
+            }
+            if (isDriving) {
+                isScrollGesturesEnabled = false
+                isRotateGesturesEnabled = false
+                isTiltGesturesEnabled = false
+                isZoomGesturesEnabled = false
+            } else {
+                isScrollGesturesEnabled = true
+                isRotateGesturesEnabled = true
+                isTiltGesturesEnabled = true
+                isZoomGesturesEnabled = true
+            }
+            ridePoint?.location?.toMapkitPoint()?.let { point ->
+                mapObjects.addPlacemark().apply {
+                    geometry = point
+                    setIcon(locationPointProvider)
                 }
-                ridePoint?.location?.toMapkitPoint()?.let { point ->
-                    mapObjects.addPlacemark().apply {
-                        geometry = point
-                        setIcon(locationPointProvider)
+            }
+            results.forEach { result ->
+                mapObjects.addPlacemark().apply {
+                    geometry = result.point.toMapkitPoint()
+                    if (result == selectedResult) {
+                        setIcon(
+                            selectedPointIconProvider,
+                            IconStyle().apply {
+                                scale = 2f
+                            }
+                        )
+                    } else {
+                        setIcon(
+                            pointIconProvider,
+                            IconStyle().apply {
+                                scale = 1.5f
+                            }
+                        )
                     }
-                }
-                results.forEach { result ->
-                    mapObjects.addPlacemark().apply {
-                        geometry = result.point.toMapkitPoint()
-                        if (result == selectedResult) {
-                            setIcon(
-                                selectedPointIconProvider,
-                                IconStyle().apply {
-                                    scale = 2f
-                                }
-                            )
-                        } else {
-                            setIcon(
-                                pointIconProvider,
-                                IconStyle().apply {
-                                    scale = 1.5f
-                                }
-                            )
-                        }
-                        addTapListener { _, _ ->
-                            onDestinationSelected(result)
-                            true
-                        }
-                    }
-                }
-                (polyline as? Polyline)?.let { line ->
-                    mapObjects.addPolyline(line).apply {
-                        strokeWidth = 5f
-                        outlineWidth = 1f
-                        outlineColor = ContextCompat.getColor(context, R.color.black)
-                        setStrokeColor(ContextCompat.getColor(context, R.color.blue))
+                    addTapListener { _, _ ->
+                        onDestinationSelected(result)
+                        true
                     }
                 }
             }
-            previousLocation = ridePoint?.location
+            (polyline as? Polyline)?.let { line ->
+                mapObjects.addPolyline(line).apply {
+                    strokeWidth = 5f
+                    outlineWidth = 1f
+                    outlineColor = ContextCompat.getColor(context, R.color.black)
+                    setStrokeColor(ContextCompat.getColor(context, R.color.blue))
+                }
+            }
         }
-    )
+        previousLocation = ridePoint?.location
+    }
 }
 
 fun Point.toGeoPoint() = GeoPoint(
@@ -160,7 +176,7 @@ fun GeoPoint.toMapkitPoint() = Point(
 )
 
 fun MapViewState.toCameraPosition() = CameraPosition(
-    targetPoint.toMapkitPoint(), azimuth, tilt, zoom
+    targetPoint.toMapkitPoint(), zoom, azimuth, tilt
 )
 
 private fun Int.getBitmap(context: Context): Bitmap {

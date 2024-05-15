@@ -4,7 +4,7 @@ import com.matttax.drivebetter.map.routes.model.Route
 
 sealed interface RouteState {
 
-    data object NoSearch : RouteState
+    data object NoRoute : RouteState
 
     data object Loading : RouteState
 
@@ -13,4 +13,6 @@ sealed interface RouteState {
     data class Error(val message: String) : RouteState
 
     data class Results(val list: List<Route>) : RouteState
+
+    data class Riding(val seconds: Int) : RouteState
 }

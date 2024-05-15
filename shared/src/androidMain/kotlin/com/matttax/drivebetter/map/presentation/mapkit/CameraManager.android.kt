@@ -5,7 +5,7 @@ import com.matttax.drivebetter.map.presentation.states.MapViewState
 
 actual object CameraManager {
 
-    actual fun getPosition(ridePoint: RidePoint?): MapViewState {
+    actual fun getPosition(ridePoint: RidePoint?, isDriving: Boolean): MapViewState {
         return if (ridePoint == null) {
             MapViewState(
                 RUSSIA_CENTER_POINT,
@@ -13,12 +13,19 @@ actual object CameraManager {
                 0.0f,
                 0.0f
             )
+        } else if (!isDriving) {
+            MapViewState(
+                ridePoint.location,
+                0.0f,
+                0.0f,
+                15.0f
+            )
         } else {
             MapViewState(
                 ridePoint.location,
-                15.0f,
-                0.0f,
-                0.0f
+                ridePoint.azimuth.azimuth.toFloat(),
+                75.0f,
+                17.0f
             )
         }
     }

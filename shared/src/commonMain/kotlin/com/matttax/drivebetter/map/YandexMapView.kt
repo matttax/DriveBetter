@@ -12,6 +12,7 @@ expect fun YandexMapView(
     locationFlow: StateFlow<RidePoint?>,
     selectedItemFlow: StateFlow<SearchItem?>,
     selectedPolyline: StateFlow<Any?>,
+    isDrivingFlow: StateFlow<Boolean>,
     searchResultsFlow: Flow<List<SearchItem>>,
     onCreate: () -> Unit,
     onUpdate: (MapViewState) -> Unit,

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.matttax.drivebetter.map.YandexMapView
 import com.matttax.drivebetter.map.presentation.components.DestinationView
+import com.matttax.drivebetter.map.presentation.components.RidingView
 import com.matttax.drivebetter.map.presentation.components.RouteView
 import com.matttax.drivebetter.map.presentation.components.SearchBar
 import com.matttax.drivebetter.map.presentation.states.RouteState
@@ -76,30 +77,45 @@ fun MapView(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(280.dp),
+                        .height(
+                            if (routeState !is RouteState.Riding) {
+                                280.dp
+                            } else 100.dp
+                        ),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    DestinationView(
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.surface)
-                            .padding(20.dp),
-                        searchItem = it,
-                        onClose = mapViewModel::onClearDestination
-                    )
+                    if (routeState !is RouteState.Riding) {
+                        DestinationView(
+                            modifier = Modifier
+                                .background(MaterialTheme.colors.surface)
+                                .padding(20.dp),
+                            searchItem = it,
+                            onClose = mapViewModel::onClearDestination
+                        )
+                    }
                     when (val routes = routeState) {
                         is RouteState.Results -> {
                             HorizontalPager(pagerState) { index ->
-                                mapViewModel.onPolylineSelected(
-                                    routes.list[index].polyline
+                                mapViewModel.onRouteSelected(
+                                    routes.list[index]
                                 )
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    RouteView(routes.list[index])
+                                    RouteView(
+                                        route = routes.list[index],
+                                        onStartRide = mapViewModel::startRide
+                                    )
                                     BodyText("${index + 1} / ${routes.list.size}")
                                 }
                             }
+                        }
+                        is RouteState.Riding -> {
+                            RidingView(
+                                timeSec = routes.seconds,
+                                onFinish = mapViewModel::finishRide
+                            )
                         }
                         is RouteState.Loading -> {
                             ProgressBar(
@@ -122,7 +138,7 @@ fun MapView(
                                 BodyText(stringResource(SharedRes.strings.no_routes))
                             }
                         }
-                        is RouteState.NoSearch -> Unit
+                        is RouteState.NoRoute -> Unit
                     }
                 }
             }
@@ -131,6 +147,7 @@ fun MapView(
             mapViewModel.currentRidePoint,
             mapViewModel.selectedDestination,
             mapViewModel.selectedPolyline,
+            mapViewModel.isDriving,
             mapViewModel.searchState.map { state ->
                 (state as? SearchState.Results)?.list ?: emptyList()
             },

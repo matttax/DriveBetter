@@ -13,10 +13,18 @@ import com.matttax.drivebetter.map.routes.RouteSearchRequest
 import com.matttax.drivebetter.map.search.SearchManagerFacade
 import com.matttax.drivebetter.ui.utils.NumericUtils.ifZero
 import com.matttax.drivebetter.coroutines.provideDispatcher
+import com.matttax.drivebetter.map.routes.model.Route
 import dev.icerock.moko.geo.LatLng
 import dev.icerock.moko.geo.LocationTracker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -43,7 +51,7 @@ class MapViewModel : ViewModel() {
     private val _searchState = MutableStateFlow<SearchState>(SearchState.NoSearch)
     val searchState: StateFlow<SearchState> get() = _searchState
 
-    private val _routeState = MutableStateFlow<RouteState>(RouteState.NoSearch)
+    private val _routeState = MutableStateFlow<RouteState>(RouteState.NoRoute)
     val routeState: StateFlow<RouteState> get() = _routeState
 
     private val _selectedDestination = MutableStateFlow<SearchItem?>(null)
@@ -52,13 +60,18 @@ class MapViewModel : ViewModel() {
     private val _selectedPolyline = MutableStateFlow<Any?>(null)
     val selectedPolyline: StateFlow<Any?> get() = _selectedPolyline
 
+    private val _isDriving = MutableStateFlow(false)
+    val isDriving: StateFlow<Boolean> get() = _isDriving
+
     private val mapState = MutableStateFlow<MapViewState?>(null)
+    private var selectedRoute: Route? = null
 
     fun init() {
         routeFinderFacade = RouteFinderFacade()
         searchManagerFacade = SearchManagerFacade()
         observeSearchResults()
         observeRoutes()
+        observeRide()
     }
 
     fun setLocationTracker(locationTracker: LocationTracker) {
@@ -109,8 +122,9 @@ class MapViewModel : ViewModel() {
         }
     }
 
-    fun onPolylineSelected(polyline: Any) {
-        _selectedPolyline.value = polyline
+    fun onRouteSelected(route: Route) {
+        _selectedPolyline.value = route.polyline
+        selectedRoute = route
     }
 
     fun refreshRoutes() {
@@ -123,8 +137,23 @@ class MapViewModel : ViewModel() {
     }
 
     fun onClearDestination() {
+        selectedRoute = null
         _selectedDestination.value = null
+        _routeState.value = RouteState.NoRoute
+        _searchState.value = SearchState.NoSearch
         routeFinderFacade.cancelRequest()
+        clearPolyline()
+        if (_isDriving.value) {
+            _isDriving.value = false
+        }
+    }
+
+    fun startRide() {
+        _isDriving.value = true
+    }
+
+    fun finishRide() {
+        _isDriving.value = false
     }
 
     private fun onSearch(query: String, topLeftPoint: GeoPoint, bottomRightPoint: GeoPoint) {
@@ -186,6 +215,34 @@ class MapViewModel : ViewModel() {
                     else -> RouteState.Empty
                 }
             }.launchIn(viewModelScope)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeRide() {
+        _isDriving.flatMapLatest { driving ->
+            if (driving) {
+                timer()
+            } else {
+                onClearDestination()
+                _routeState.value = RouteState.NoRoute
+                flow<Int?> { emit(null) }
+            }
+        }
+            .filterNotNull()
+            .onEach {
+                _routeState.value = RouteState.Riding(it)
+            }.launchIn(viewModelScope)
+    }
+
+    private fun timer(): Flow<Int> {
+        return flow {
+            var time = 0
+            while (true) {
+                delay(1000)
+                time += 1
+                emit(time)
+            }
+        }
     }
 
     companion object {
