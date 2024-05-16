@@ -8,5 +8,7 @@ interface LoginStorage {
 
     var lastProfile: ProfileDomainModel?
 
+    var avatar: ByteArray?
+
     fun clear()
 }

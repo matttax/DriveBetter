@@ -20,12 +20,20 @@ class LoginStorageImpl : LoginStorage {
         }
 
     override var lastProfile: ProfileDomainModel?
-        get() = settings[StorageKeys.PROFILE_DATA.key]
+        get() {
+            val profileJson = settings.get<String>(StorageKeys.PROFILE_DATA.key)
+            return profileJson?.let {
+                Json.decodeFromString<ProfileDomainModel>(it)
+            }
+        }
         set(value) {
-            settings[StorageKeys.PROFILE_DATA.key] =
-                Json.encodeToString(value)
+            settings[StorageKeys.PROFILE_DATA.key] = Json.encodeToString(value)
             log.d { "profileId saved: $lastProfile" }
         }
+
+    override var avatar: ByteArray?
+        get() = null
+        set(value) {}
 
     override fun clear() {
         settings.clear()

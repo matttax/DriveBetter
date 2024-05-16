@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.matttax.drivebetter.ui.utils.ColorUtils
 import dev.icerock.moko.resources.compose.fontFamilyResource
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.PopUpTo
 import org.example.library.SharedRes
 
 @Composable
@@ -43,7 +45,12 @@ fun BottomNavigationBar(navigator: Navigator) {
                         .weight(0.25f)
                         .padding(vertical = 10.dp),
                     onClick = {
-                        navigator.navigate(item.route)
+                        navigator.navigate(
+                            item.route,
+                            NavOptions(
+                                popUpTo = PopUpTo.First()
+                            ),
+                        )
                     }
                 ) {
                     Column(

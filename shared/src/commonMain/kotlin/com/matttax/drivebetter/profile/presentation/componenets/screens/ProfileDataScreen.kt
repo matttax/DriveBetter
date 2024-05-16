@@ -19,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BrowseGallery
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.runtime.Composable
@@ -69,7 +70,13 @@ fun ProfileDataScreen(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .clip(CircleShape),
-            resource = asyncPainterResource("https://sun6-21.userapi.com/impg/deRh_H_PsmQ_iKqV3gKXoq9twi2cj6mbSu3vhg/2m5NhD3iIZg.jpg?size=604x483&quality=95&sign=3338e7eaa26f8d86efaed0e5d0c11080&c_uniq_tag=g5Zr4fEFAjvek8L1-dhr-JzRM1ryCwI1fxw_b_TpV6w&type=album"),
+            resource = asyncPainterResource(profile.avatarByteArray.toString()),
+            onFailure = {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = null
+                )
+            },
             contentDescription = null,
             contentScale = ContentScale.FillWidth
         )
@@ -103,6 +110,10 @@ fun ProfileDataScreen(
         DataField(
             title = StringUtils.ProfileFields.RATING,
             data = if (profile.rating == null) "" else ((profile.rating * 100).toInt() / 100.0).toString()
+        )
+        StringDataField(
+            title = "Voice notifications",
+            data = "Enabled"
         )
         Spacer(
             modifier = Modifier.weight(1f)

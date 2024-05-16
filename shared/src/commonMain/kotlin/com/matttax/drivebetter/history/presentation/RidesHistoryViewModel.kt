@@ -34,7 +34,12 @@ class RidesHistoryViewModel(
         } else {
             _viewState.value = RideHistoryState.Loading
             viewModelScope.launch {
-                _viewState.value = RideHistoryState.RidesList(rideRepository.getRideHistoryById(""))
+                val result = rideRepository.getRideHistory()
+                _viewState.value = if (result.isSuccess) {
+                    RideHistoryState.RidesList(result.getOrThrow())
+                } else {
+                    RideHistoryState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
+                }
             }
         }
     }

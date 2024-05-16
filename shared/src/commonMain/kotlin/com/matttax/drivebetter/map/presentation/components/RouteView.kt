@@ -39,6 +39,10 @@ fun RouteView(
             key = stringResource(SharedRes.strings.time_with_traffic),
             value = route.metadata.timeWithTraffic
         )
+        KeyValueData(
+            key = "Safety index",
+            value = "8.16"
+        )
         Button(
             modifier = Modifier.fillMaxWidth(0.8f),
             onClick = onStartRide,

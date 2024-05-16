@@ -35,13 +35,13 @@ private fun dataModule() = module {
 
     factory<RideRepository> {
         RideRepositoryImpl(
-            ktorService = get()
+            ktorService = get(),
+            loginStorage = get()
         )
     }
 
     factory<ProfileRepository> {
         ProfileRepositoryImpl(
-//            profileLocalDataSource = get(),
             profileRemoteDataSource = get(),
             loginStorage = get(),
         )
@@ -56,16 +56,6 @@ private fun dataModule() = module {
     single<LoginStorage> {
         LoginStorageImpl()
     }
-
-//    single<ProfileLocalDataSource> {
-//        ProfileLocalDataSourceImpl(
-//            databaseDriverFactory = get()
-//        )
-//    }
-//
-//    single {
-//        DatabaseDriverFactory()
-//    }
 
     single {
         KtorService()

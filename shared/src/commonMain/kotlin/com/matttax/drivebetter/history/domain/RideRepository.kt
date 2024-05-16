@@ -4,8 +4,8 @@ import com.matttax.drivebetter.history.domain.model.Ride
 
 interface RideRepository {
 
-    suspend fun getRideHistoryById(userId: String): List<Ride>
+    suspend fun getRideHistory(): Result<List<Ride>>
 
-    suspend fun getRideById(id: Int): Ride?
+    suspend fun getRideById(id: Int): Result<Ride?>
 
 }
