@@ -79,7 +79,7 @@ fun MapView(
                         .fillMaxWidth()
                         .height(
                             if (routeState !is RouteState.Riding) {
-                                280.dp
+                                310.dp
                             } else 100.dp
                         ),
                     verticalArrangement = Arrangement.Center
@@ -105,9 +105,12 @@ fun MapView(
                                 ) {
                                     RouteView(
                                         route = routes.list[index],
-                                        onStartRide = mapViewModel::startRide
+                                        onStartRide = mapViewModel::startRide,
                                     )
-                                    BodyText("${index + 1} / ${routes.list.size}")
+                                    BodyText(
+                                        text = "${index + 1} / ${routes.list.size}",
+                                        maxLines = 1
+                                    )
                                 }
                             }
                         }

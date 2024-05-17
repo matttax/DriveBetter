@@ -15,6 +15,10 @@ import com.matttax.drivebetter.ui.utils.NumericUtils.ifZero
 import com.matttax.drivebetter.coroutines.provideDispatcher
 import com.matttax.drivebetter.map.domain.DriveManager
 import com.matttax.drivebetter.map.routes.model.Route
+import com.matttax.drivebetter.voice.Language
+import com.matttax.drivebetter.voice.MessageDispatcher
+import com.matttax.drivebetter.voice.MessageSpeller
+import com.matttax.drivebetter.voice.model.SpeedViolation
 import dev.icerock.moko.geo.LatLng
 import dev.icerock.moko.geo.LocationTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,7 +39,8 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.lighthousegames.logging.KmLog
 
 class MapViewModel(
-    private val driveManager: DriveManager
+    private val driveManager: DriveManager,
+    private val messageDispatcher: MessageDispatcher
 ) : ViewModel() {
 
     private lateinit var searchManagerFacade: SearchManagerFacade
@@ -155,10 +160,12 @@ class MapViewModel(
     }
 
     fun startRide() {
+        messageDispatcher.onRideStarted()
         _isDriving.value = true
     }
 
     fun finishRide() {
+        messageDispatcher.onRideEnded()
         _isDriving.value = false
     }
 
@@ -198,6 +205,14 @@ class MapViewModel(
                         if (_routeState.value is RouteState.Riding) {
                             driveManager.addRidePoint(it)
                         }
+                        if (it.speed.value > 90) {
+                            messageDispatcher.onSpeedExceeded(
+                                SpeedViolation(
+                                    actualSpeed = it.speed.value,
+                                    recommendedSpeed = 90.0
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -222,7 +237,9 @@ class MapViewModel(
                 if (_routeState.value is RouteState.Riding) return@onEach
                 _routeState.value = when {
                     it.isFailure -> RouteState.Error(it.exceptionOrNull()?.message ?: "Unknown error")
-                    it.isSuccess && it.getOrNull().isNullOrEmpty().not() -> RouteState.Results(it.getOrNull()!!)
+                    it.isSuccess && it.getOrNull().isNullOrEmpty().not() -> RouteState.Results(
+                        it.getOrNull()?.sortedBy { ride -> ride.safetyIndex }!!
+                    )
                     else -> RouteState.Empty
                 }
             }.launchIn(viewModelScope)

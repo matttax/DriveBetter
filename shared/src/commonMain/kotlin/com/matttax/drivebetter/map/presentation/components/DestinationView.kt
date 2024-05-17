@@ -30,8 +30,14 @@ fun DestinationView(
         ) {
             searchItem.name?.let { name ->
                 searchItem.description?.let { description ->
-                    Title(name)
-                    SectionTitle(description)
+                    Title(
+                        text = name,
+                        maxLines = 1
+                    )
+                    SectionTitle(
+                        text = description,
+                        maxLines = 2
+                    )
                 }
             }
         }

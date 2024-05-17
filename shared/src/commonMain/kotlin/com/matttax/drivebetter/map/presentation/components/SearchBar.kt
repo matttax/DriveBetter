@@ -15,9 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.matttax.drivebetter.ui.common.text.SectionTitle
+import dev.icerock.moko.resources.compose.fontFamilyResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.flow.Flow
 import org.example.library.SharedRes
@@ -47,6 +50,10 @@ fun SearchBar(
                 text = stringResource(SharedRes.strings.search),
             )
         },
+        textStyle = TextStyle(
+            fontFamily = fontFamilyResource(SharedRes.fonts.yandex_sans_display_regular),
+            fontSize = 19.sp
+        ),
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(

@@ -39,6 +39,7 @@
     <string name="search">Search</string>
     <string name="distance">Distance</string>
     <string name="time">Time</string>
+    <string name="safety_index">Safety index</string>
     <string name="time_with_traffic">Time with traffic</string>
     <string name="railway_crossing_count">Railway crossings</string>
     <string name="pedestrian_crossing_count">Pedestrian crossings</string>

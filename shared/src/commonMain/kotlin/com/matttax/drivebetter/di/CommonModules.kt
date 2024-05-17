@@ -14,27 +14,45 @@ import com.matttax.drivebetter.profile.data.token.LoginStorage
 import com.matttax.drivebetter.profile.data.token.LoginStorageImpl
 import com.matttax.drivebetter.profile.domain.ProfileRepository
 import com.matttax.drivebetter.profile.presentation.ProfileViewModel
+import com.matttax.drivebetter.voice.MessageDispatcher
+import com.matttax.drivebetter.voice.MessageSpeller
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun dataModule() = module {
-    factory {
+    single {
         ProfileViewModel(
             repository = get()
         )
     }
 
-    factory {
+    single {
         RidesHistoryViewModel(
             rideRepository = get(),
             loginStorage = get()
         )
     }
 
-    factory {
+    single {
         MapViewModel(
-            driveManager = get()
+            driveManager = get(),
+            messageDispatcher = get()
         )
+    }
+
+    single<MessageDispatcher> {
+        MessageDispatcher(
+            messageSpeller = get()
+        )
+    }
+
+    single<MessageSpeller> {
+        MessageSpeller()
     }
 
     factory<RideRepository> {
@@ -56,6 +74,10 @@ private fun dataModule() = module {
             ktorService = get(),
             loginStorage = get()
         )
+    } onClose {
+        GlobalScope.launch {
+            it?.sendBatch(isFinal = true)
+        }
     }
 
     single<ProfileRemoteDataSource> {

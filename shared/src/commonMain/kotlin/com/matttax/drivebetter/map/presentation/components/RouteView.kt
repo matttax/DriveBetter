@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.matttax.drivebetter.history.presentation.componenets.ride.KeyValueData
 import com.matttax.drivebetter.map.routes.model.Route
+import com.matttax.drivebetter.ui.utils.NumericUtils.toRoundedString
 import dev.icerock.moko.resources.compose.stringResource
 import org.example.library.SharedRes
 
@@ -40,8 +41,8 @@ fun RouteView(
             value = route.metadata.timeWithTraffic
         )
         KeyValueData(
-            key = "Safety index",
-            value = "8.16"
+            key = stringResource(SharedRes.strings.safety_index),
+            value = route.safetyIndex.toRoundedString()
         )
         Button(
             modifier = Modifier.fillMaxWidth(0.8f),
