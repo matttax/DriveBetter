@@ -1,35 +1,66 @@
 package com.matttax.drivebetter.profile.data.network
 
 import com.matttax.drivebetter.KtorService
-import com.matttax.drivebetter.profile.data.ProfileRemoteDataSource
-import com.matttax.drivebetter.profile.domain.model.ProfileDomainModel
 import com.matttax.drivebetter.coroutines.provideDispatcher
+import com.matttax.drivebetter.profile.data.ProfileRemoteDataSource
+import com.matttax.drivebetter.profile.data.network.model.TokenHolder
+import com.matttax.drivebetter.profile.data.network.model.edit.EditResponseBody
+import com.matttax.drivebetter.profile.data.network.model.edit.toDomainModel
+import com.matttax.drivebetter.profile.data.network.model.edit.toDomainModelWithToken
+import com.matttax.drivebetter.profile.data.network.model.edit.toEditBody
+import com.matttax.drivebetter.profile.data.network.model.login.LogInErrorHolder
+import com.matttax.drivebetter.profile.data.network.model.login.LogInRequestBody
+import com.matttax.drivebetter.profile.data.network.model.login.toThrowable
+import com.matttax.drivebetter.profile.data.network.model.registration.RegistrationErrorHolder
+import com.matttax.drivebetter.profile.data.network.model.registration.toRequestBody
+import com.matttax.drivebetter.profile.data.network.model.registration.toThrowable
+import com.matttax.drivebetter.profile.domain.model.ProfileDomainModel
 import io.ktor.client.call.body
+import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.lighthousegames.logging.KmLog
+import kotlin.concurrent.Volatile
 
 class ProfileRemoteDataSourceImpl(
     private val ktorService: KtorService
 ) : ProfileRemoteDataSource {
 
-    override suspend fun logIn(email: String, password: String): Result<TokenHolder> {
+    @Volatile
+    private var cachedToken: String? = null
+
+    override suspend fun logIn(email: String, password: String): Result<ProfileDomainModel> {
         return withContext(provideDispatcher().io) {
-            val response = ktorService.client.post("${KtorService.BASE_URL}api/login") {
+            val token = getToken(email, password)?.token ?: return@withContext Result.failure(LogInException("Cannot obtain token"))
+            val dataResponse = ktorService.client.put("${KtorService.BASE_URL}api/profile") {
                 contentType(ContentType.Application.Json)
-                setBody(Json.encodeToString(LogInRequestBody(email, password)))
+                headers {
+                    append(AUTH_TOKEN_HEADER, "Token $token")
+                }
+                setBody("{}")
             }
-            when(response.status) {
-                HttpStatusCode.OK -> Result.success(response.body<TokenHolder>())
-                else -> Result.failure(response.body<LogInErrorHolder>().toThrowable())
+            when(dataResponse.status) {
+                HttpStatusCode.OK -> {
+                    val body = dataResponse.body<EditResponseBody>().also {
+                        log.d { "sign in response: $it" }
+                    }
+                    Result.success(body.toDomainModelWithToken(token))
+                }
+                else -> {
+                    val throwable = try {
+                        dataResponse.body<LogInErrorHolder>().toThrowable()
+                    } catch (ex: Throwable) {
+                        ex
+                    }
+                    Result.failure(throwable)
+                }
             }
         }
     }
@@ -48,7 +79,10 @@ class ProfileRemoteDataSourceImpl(
             }
             log.d { "sign up response(${registrationResponse.status.value}): ${registrationResponse.body<String>()}" }
             when (registrationResponse.status) {
-                HttpStatusCode.Created -> logIn(profileDomainModel.email!!, password)
+                HttpStatusCode.Created -> {
+                    val token = getToken(profileDomainModel.email!!, password)
+                    token?.let { Result.success(it) } ?: Result.failure(RegistrationException("Unable to obtain token"))
+                }
                 else -> Result.failure(
                     registrationResponse.body<RegistrationErrorHolder>().toThrowable(registrationResponse.status.value)
                 )
@@ -56,79 +90,48 @@ class ProfileRemoteDataSourceImpl(
         }
     }
 
+    override suspend fun edit(newProfile: ProfileDomainModel, token: String?): Result<ProfileDomainModel> {
+        val localToken = token ?: cachedToken ?: return Result.failure(InvalidTokenException())
+        return withContext(provideDispatcher().io) {
+            val editResponse = ktorService.client.put("${KtorService.BASE_URL}api/profile") {
+                contentType(ContentType.Application.Json)
+                headers {
+                    append(AUTH_TOKEN_HEADER, "Token $localToken")
+                }
+                setBody(
+                    Json.encodeToString(newProfile.toEditBody())
+                        .also { bodyJson -> log.d { "edit request: $bodyJson" } }
+                )
+            }
+            val body = editResponse.body<String>()
+            log.d { "edit response(${editResponse.status.value}): $body" }
+            when (editResponse.status) {
+                HttpStatusCode.OK -> {
+                    Result.success(editResponse.body<EditResponseBody>().toDomainModel())
+                }
+                else -> Result.failure(EditProfileException(body))
+            }
+        }
+    }
+
+    private suspend fun getToken(email: String, password: String): TokenHolder? {
+        cachedToken = null
+        return withContext(provideDispatcher().io) {
+            val authResponse = ktorService.client.post("${KtorService.BASE_URL}api/login") {
+                contentType(ContentType.Application.Json)
+                setBody(Json.encodeToString(LogInRequestBody(email, password)))
+            }
+            if (authResponse.status == HttpStatusCode.OK) {
+                authResponse.body<TokenHolder?>().also {
+                    cachedToken = it?.token
+                    log.d { "token body: $it" }
+                }
+            } else null
+        }
+    }
+
     companion object {
         private val log = KmLog("ProfileRemoteDataSourceImpl")
+        private const val AUTH_TOKEN_HEADER = "Authorization"
     }
 }
-
-@Serializable data class LogInRequestBody(
-    @SerialName("email") val email: String,
-    @SerialName("password") val password: String
-)
-
-@Serializable data class SignUpRequestBody(
-    @SerialName("uuid") val uuid: String,
-    @SerialName("name") val name: String,
-    @SerialName("gender") val gender: String,
-    @SerialName("city") val city: String,
-    @SerialName("birth_date") val birthDate: String,
-    @SerialName("licence") val license: String,
-    @SerialName("licence_received") val licenseReceived: String,
-    @SerialName("email") val email: String,
-    @SerialName("password") val password: String
-)
-
-fun ProfileDomainModel.toRequestBody(password: String) = SignUpRequestBody(
-    uuid = uuid.toString(),
-    name = name!!,
-    gender = gender!!.text.lowercase(),
-    city = city!!,
-    birthDate = dateOfBirthString!!,
-    license = driversLicenseId!!,
-    licenseReceived = dateLicenseIssuedString!!,
-    email = email!!,
-    password = password
-)
-
-@Serializable data class TokenHolder(
-    @SerialName ("token") val token: String
-)
-
-@Serializable data class LogInErrorHolder(
-    @SerialName ("error") val error: String,
-)
-
-@Serializable data class RegistrationErrorHolder(
-    @SerialName("uuid") val uuid: String? = null,
-    @SerialName("name") val name: String? = null,
-    @SerialName("gender") val gender: String? = null,
-    @SerialName("city") val city: String? = null,
-    @SerialName("birth_date") val birthDate: String? = null,
-    @SerialName("licence") val license: String? = null,
-    @SerialName("licence_received") val licenseReceived: String? = null,
-    @SerialName("email") val email: List<String>? = null,
-    @SerialName("password") val password: String? = null
-)
-
-fun LogInErrorHolder.toThrowable(): Throwable {
-    return LogInException(error)
-}
-
-fun RegistrationErrorHolder.toThrowable(code: Int): Throwable {
-    val message = buildString {
-        append("Registration failed ($code): " )
-        if (uuid != null) append("uuid: $uuid, ")
-        if (name != null) append("name: $name, ")
-        if (gender != null) append("gender: $gender, ")
-        if (birthDate != null) append("birth_date: $birthDate, ")
-        if (license != null) append("licence: $license, ")
-        if (licenseReceived != null) append("licence_received: $licenseReceived, ")
-        if (email != null) append("email: ${email.joinToString(", ")}, ")
-        if (password != null) append("password: $password, ")
-    }
-    return RegistrationException(message)
-}
-
-class LogInException(override val message: String?) : RuntimeException()
-open class RegistrationException(override val message: String?) : RuntimeException()
-class IncompleteProfileException : RegistrationException(message = "Profile is missing important fields")

@@ -60,6 +60,7 @@ fun NavigatorApp() {
                     ) {
                         ProfileScreen(
                             modifier = defaultModifier,
+                            snackbarHostState = snackbarHostState,
                             viewModel = profileViewModel
                         )
                     }

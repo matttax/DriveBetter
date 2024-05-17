@@ -37,6 +37,8 @@ class RidesHistoryViewModel(
                 val result = rideRepository.getRideHistory()
                 _viewState.value = if (result.isSuccess) {
                     RideHistoryState.RidesList(result.getOrThrow())
+                } else if (result.getOrNull()?.isEmpty() == true) {
+                    RideHistoryState.Error("No rides found")
                 } else {
                     RideHistoryState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
                 }

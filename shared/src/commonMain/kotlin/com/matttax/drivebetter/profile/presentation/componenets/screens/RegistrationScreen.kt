@@ -38,7 +38,9 @@ fun RegistrationScreen(
 ) {
     var genderVisible by remember { mutableStateOf(false) }
     var dateOfIssueVisible by remember { mutableStateOf(false) }
-    var profile by remember { mutableStateOf(ProfileDomainModel()) }
+    var profile by remember {
+        mutableStateOf(ProfileDomainModel())
+    }
     var password by remember { mutableStateOf<String?>(null) }
     val profileValid by remember {
         derivedStateOf { profile.isValid.also { println(profile) } }

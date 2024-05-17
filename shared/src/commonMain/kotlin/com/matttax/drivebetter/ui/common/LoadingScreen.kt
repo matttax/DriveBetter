@@ -16,3 +16,4 @@ fun LoadingScreen() {
         ProgressBar(size = 50.dp)
     }
 }
+

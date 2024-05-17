@@ -1,6 +1,7 @@
 package com.matttax.drivebetter.profile.domain.state
 
 import com.matttax.drivebetter.profile.domain.model.ProfileDomainModel
+import com.matttax.drivebetter.profile.presentation.avatar.SharedImage
 
 sealed interface ProfileEvent {
 
@@ -22,5 +23,9 @@ sealed interface ProfileEvent {
 
     data class EditProfile(
         val profile: ProfileDomainModel
+    ) : ProfileEvent
+
+    data class ChangeAvatar(
+        val sharedImage: SharedImage
     ) : ProfileEvent
 }

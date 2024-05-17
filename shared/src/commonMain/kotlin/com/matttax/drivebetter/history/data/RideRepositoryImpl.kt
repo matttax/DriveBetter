@@ -9,7 +9,6 @@ import com.matttax.drivebetter.profile.data.token.LoginStorage
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
-import io.ktor.http.HttpHeaders
 import org.lighthousegames.logging.KmLog
 
 class RideRepositoryImpl(
@@ -27,9 +26,9 @@ class RideRepositoryImpl(
         return try {
             val response = withContext<List<Ride>?>(provideDispatcher().io) {
                 ktorService.client
-                    .get("${KtorService.BASE_URL}api/rides") {
+                    .get("${KtorService.BASE_URL}api/ride") {
                         headers {
-                            append(HttpHeaders.Authorization, token)
+                            append(AUTH_TOKEN_HEADER, "Token $token")
                         }
                     }.body()
             }
@@ -48,6 +47,7 @@ class RideRepositoryImpl(
 
     companion object {
         private val log = KmLog("RideRepositoryImpl")
+        private const val AUTH_TOKEN_HEADER = "Authorization"
     }
 
 }

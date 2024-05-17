@@ -11,3 +11,4 @@ expect class GalleryManager(
 ) {
     fun launch()
 }
+

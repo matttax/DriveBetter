@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
 import com.matttax.drivebetter.permissions.PermissionCallback
 import com.matttax.drivebetter.permissions.PermissionStatus
 import com.matttax.drivebetter.permissions.PermissionType
@@ -20,6 +19,7 @@ import com.matttax.drivebetter.profile.presentation.avatar.rememberGalleryManage
 import com.matttax.drivebetter.profile.presentation.componenets.screens.ImageSourceOptionDialog
 import com.matttax.drivebetter.ui.utils.StringUtils
 import com.matttax.drivebetter.coroutines.provideDispatcher
+import com.matttax.drivebetter.profile.presentation.avatar.SharedImage
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun ChangeAvatarButton(
-    onImageSelected: (bitmap: ImageBitmap) -> Unit
+    onImageSelected: (bitmap: SharedImage) -> Unit
 ) {
     val chooseDialogState = rememberMaterialDialogState()
     val permissionDialogState = rememberMaterialDialogState()
@@ -57,21 +57,21 @@ fun ChangeAvatarButton(
             }
         }
     )
-    val cameraManager = rememberCameraManager {
+    val cameraManager = rememberCameraManager { image ->
         coroutineScope.launch {
             withContext(provideDispatcher().io) {
-                it?.toImageBitmap()
-            }?.also {
-                onImageSelected(it)
+                image?.let {
+                    onImageSelected(it)
+                }
             }
         }
     }
-    val galleryManager = rememberGalleryManager {
+    val galleryManager = rememberGalleryManager { image ->
         coroutineScope.launch {
             withContext(provideDispatcher().io) {
-                it?.toImageBitmap()
-            }?.also {
-                onImageSelected(it)
+                image?.let {
+                    onImageSelected(it)
+                }
             }
         }
     }

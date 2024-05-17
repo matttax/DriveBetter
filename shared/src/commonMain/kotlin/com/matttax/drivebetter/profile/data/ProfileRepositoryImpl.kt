@@ -19,32 +19,55 @@ class ProfileRepositoryImpl(
             loginStorage.clear()
             return null
         }
-        return lastProfile
+        return lastProfile.copy(avatarByteArray = loginStorage.avatar)
     }
 
-    override suspend fun logIn(request: ProfileEvent.EnterProfile): Boolean {
-        val loginResult = profileRemoteDataSource.logIn(request.email, request.password)
-        if (loginResult.isSuccess) {
-            val token = loginResult.getOrNull()?.token
-            loginStorage.token = token
-            return token.isNullOrBlank().not()
+    override suspend fun logIn(request: ProfileEvent.EnterProfile): ProfileDomainModel? {
+        return try {
+            val loginResult = profileRemoteDataSource.logIn(request.email, request.password)
+            log.d { "login result: $loginResult" }
+            if (loginResult.isSuccess) {
+                val profile = loginResult.getOrNull()
+                loginStorage.token = profile?.token
+                loginStorage.lastProfile = profile
+                return profile
+            }
+            null
+        } catch (ex: Throwable) {
+            null
         }
-        return false
     }
 
     override suspend fun signUp(request: ProfileEvent.CreateProfile): Boolean {
-        val registrationResult = profileRemoteDataSource.signUp(request.profile, request.password)
-        log.d { registrationResult }
-        if (registrationResult.isSuccess) {
-            val token = registrationResult.getOrNull()?.token
-            log.d { "token: $token" }
-            loginStorage.token = token
-            request.profile.let {
-                loginStorage.lastProfile = it
-                log.d { "saving to db: $it" }
+        return try {
+            val registrationResult = profileRemoteDataSource.signUp(request.profile, request.password)
+            log.d { "registration result $registrationResult" }
+            if (registrationResult.isSuccess) {
+                val token = registrationResult.getOrNull()?.token
+                log.d { "token: $token" }
+                loginStorage.token = token
+                request.profile.let {
+                    loginStorage.lastProfile = it
+                    log.d { "saving to db: $it" }
+                }
+                return true
             }
-            return true
+            false
+        } catch (ex: Throwable) { false }
+    }
+
+    override suspend fun edit(newData: ProfileDomainModel): ProfileDomainModel? {
+        val editResult = profileRemoteDataSource.edit(newData, loginStorage.token)
+        log.d { "edit result: $editResult" }
+        if (editResult.isSuccess) {
+            editResult.getOrNull()?.let {
+                loginStorage.lastProfile = it
+            }
         }
+        return editResult.getOrNull()
+    }
+
+    override suspend fun changeAvatar(avatar: ByteArray): Boolean {
         return false
     }
 

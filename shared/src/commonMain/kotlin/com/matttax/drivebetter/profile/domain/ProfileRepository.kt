@@ -7,9 +7,13 @@ interface ProfileRepository {
 
     suspend fun isLoggedIn(): ProfileDomainModel?
 
-    suspend fun logIn(request: ProfileEvent.EnterProfile): Boolean
+    suspend fun logIn(request: ProfileEvent.EnterProfile): ProfileDomainModel?
 
     suspend fun signUp(request: ProfileEvent.CreateProfile): Boolean
+
+    suspend fun edit(newData: ProfileDomainModel) : ProfileDomainModel?
+
+    suspend fun changeAvatar(avatar: ByteArray): Boolean
 
     fun logOut()
 }

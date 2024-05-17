@@ -10,9 +10,11 @@ enum class Gender(val text: String) {
         }
 
         fun String.asGender(): Gender? {
-            return when(this) {
-                "Male" -> MALE
-                "Female" -> FEMALE
+            return when(trim()) {
+                "Male",
+                "male" -> MALE
+                "Female",
+                "female" -> FEMALE
                 else -> null
             }
         }

@@ -3,19 +3,22 @@ package com.matttax.drivebetter.profile.domain.model
 import com.matttax.drivebetter.profile.data.AccountIdProvider
 import com.matttax.drivebetter.profile.domain.util.DateConverter
 import com.matttax.drivebetter.profile.domain.util.DateConverter.asString
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlin.math.abs
 
 data class ProfileDomainModel(
-    val uuid: Long = AccountIdProvider.newId(),
     val name: String? = null,
     val gender: Gender? = null,
     val city: String? = null,
     val driversLicenseId: String? = null,
     val rating: Double? = null,
-    val avatarByteArray: ByteArray? = null,
     val email: String? = null,
     val dateOfBirth: LocalDate? = null,
-    val dateLicenseIssued: LocalDate? = null
+    val dateLicenseIssued: LocalDate? = null,
+    val uuid: Long = AccountIdProvider.newId(),
+    val avatarByteArray: ByteArray? = null,
 ) {
     val isValid: Boolean
         get() = name != null
@@ -32,13 +35,24 @@ data class ProfileDomainModel(
     val dateLicenseIssuedString: String?
         get() = dateLicenseIssued?.asString()
 
-    fun setDateOfBirth(date: String): ProfileDomainModel {
+    val age: Int
+        get() {
+            val epochDays = (Clock.System.now().epochSeconds / 86400).toInt()
+            val gap = dateOfBirth?.minus(LocalDate.fromEpochDays(epochDays))
+            return abs(gap?.years ?: 0)
+        }
+
+    var token: String? = null
+
+    fun setDateOfBirth(date: String?): ProfileDomainModel {
+        if (date == null) return this
         return DateConverter.fromString(date)?.let {
             this.copy(dateOfBirth = it)
         } ?: this
     }
 
-    fun setDateOfIssue(date: String): ProfileDomainModel {
+    fun setDateOfIssue(date: String?): ProfileDomainModel {
+        if (date == null) return this
         return DateConverter.fromString(date)?.let {
             this.copy(dateLicenseIssued = it)
         } ?: this
