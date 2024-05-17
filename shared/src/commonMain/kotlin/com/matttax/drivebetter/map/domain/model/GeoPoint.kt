@@ -7,8 +7,6 @@ data class GeoPoint(
     val longitude: Double
 )
 
-
-
 fun GeoPoint.isCloseTo(point: GeoPoint?): Boolean {
     if (point == null) return false
     return abs(latitude - point.latitude) < PROXIMITY_DELTA && abs(longitude - point.longitude) < PROXIMITY_DELTA

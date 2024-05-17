@@ -23,7 +23,7 @@ actual object CameraManager {
         } else {
             MapViewState(
                 ridePoint.location,
-                ridePoint.azimuth.azimuth.toFloat(),
+                ridePoint.azimuth.value.toFloat(),
                 75.0f,
                 17.0f
             )

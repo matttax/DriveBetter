@@ -4,5 +4,5 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 value class Speed(
-    val speed: Double
+    val value: Double
 )

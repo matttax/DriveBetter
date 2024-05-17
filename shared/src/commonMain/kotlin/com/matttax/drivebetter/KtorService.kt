@@ -19,6 +19,6 @@ class KtorService {
     }
 
     companion object {
-        const val BASE_URL = "http://34.155.177.3:8000/"
+        const val BASE_URL = "http://130.193.34.166:8000/"
     }
 }

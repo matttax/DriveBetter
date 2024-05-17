@@ -47,7 +47,17 @@ kotlin {
             }
         }
         val commonMain by getting {
+
             dependencies {
+
+                // dependency injection
+                api(libs.koin.core)
+                implementation(libs.koin.compose)
+
+                // coroutines
+                implementation(libs.kotlinx.coroutines.core)
+
+                // compose
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -55,25 +65,43 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
+
+                // compose utils
+                implementation(libs.compose.material.dialogs)
+
+                //images
                 implementation(libs.kamel)
+
+                // charts
+                implementation(libs.aay.chart)
+
+                // network
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.ktor.client.content.negotiation)
-                implementation(libs.kotlinx.coroutines.core)
+
+                // caching
+                implementation(libs.settings.multiplatform)
+
+                // resources
+                implementation(libs.moko.resources)
+                implementation(libs.moko.resources.compose)
+
+                // navigation & view models
                 api(libs.tlaster.precompose)
                 api(libs.tlaster.precompose.viewmodel)
                 api(libs.tlaster.precompose.koin)
-                implementation(libs.compose.material.dialogs)
-                api(libs.koin.core)
-                implementation(libs.koin.compose)
-                implementation(libs.kotlinx.datetime)
-                implementation(libs.settings.multiplatform)
-                implementation(libs.aay.chart)
-                implementation(libs.moko.resources)
-                implementation(libs.moko.resources.compose)
+
+                // location
                 api(libs.moko.geo)
                 api(libs.moko.geo.compose)
+
+                // logging
                 api(libs.lighthouse.logging)
+
+                // common utils
+                implementation(libs.kotlinx.datetime)
+
             }
         }
         val iosX64Main by getting

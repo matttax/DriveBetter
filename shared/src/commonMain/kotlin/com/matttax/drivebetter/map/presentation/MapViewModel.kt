@@ -13,6 +13,7 @@ import com.matttax.drivebetter.map.routes.RouteSearchRequest
 import com.matttax.drivebetter.map.search.SearchManagerFacade
 import com.matttax.drivebetter.ui.utils.NumericUtils.ifZero
 import com.matttax.drivebetter.coroutines.provideDispatcher
+import com.matttax.drivebetter.map.domain.DriveManager
 import com.matttax.drivebetter.map.routes.model.Route
 import dev.icerock.moko.geo.LatLng
 import dev.icerock.moko.geo.LocationTracker
@@ -21,7 +22,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -34,7 +34,9 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.lighthousegames.logging.KmLog
 
-class MapViewModel : ViewModel() {
+class MapViewModel(
+    private val driveManager: DriveManager
+) : ViewModel() {
 
     private lateinit var searchManagerFacade: SearchManagerFacade
     private lateinit var routeFinderFacade: RouteFinderFacade
@@ -66,6 +68,9 @@ class MapViewModel : ViewModel() {
     private val mapState = MutableStateFlow<MapViewState?>(null)
     private var selectedRoute: Route? = null
 
+    var isLocationManagerInitialized: Boolean = false
+        private set
+
     fun init() {
         routeFinderFacade = RouteFinderFacade()
         searchManagerFacade = SearchManagerFacade()
@@ -76,6 +81,7 @@ class MapViewModel : ViewModel() {
 
     fun setLocationTracker(locationTracker: LocationTracker) {
         this.locationTracker = locationTracker
+        isLocationManagerInitialized = true
         launchLocationTracker()
         observeLocation()
     }
@@ -188,7 +194,11 @@ class MapViewModel : ViewModel() {
                         location = extLoc.location.coordinates.toGeoPoint(),
                         speed = Speed(extLoc.speed.speedMps),
                         azimuth = Azimuth(extLoc.azimuth.azimuthDegrees)
-                    )
+                    ).also {
+                        if (_routeState.value is RouteState.Riding) {
+                            driveManager.addRidePoint(it)
+                        }
+                    }
                 }
             }
             .flowOn(provideDispatcher().io)
@@ -209,6 +219,7 @@ class MapViewModel : ViewModel() {
     private fun observeRoutes() {
         routeFinderFacade.routes
             .onEach {
+                if (_routeState.value is RouteState.Riding) return@onEach
                 _routeState.value = when {
                     it.isFailure -> RouteState.Error(it.exceptionOrNull()?.message ?: "Unknown error")
                     it.isSuccess && it.getOrNull().isNullOrEmpty().not() -> RouteState.Results(it.getOrNull()!!)
@@ -220,12 +231,15 @@ class MapViewModel : ViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeRide() {
         _isDriving.flatMapLatest { driving ->
-            if (driving) {
-                timer()
-            } else {
+            if (!driving) {
                 onClearDestination()
+                driveManager.sendBatch(isFinal = true)
                 _routeState.value = RouteState.NoRoute
                 flow<Int?> { emit(null) }
+            } else if (routeState.value is RouteState.Riding && (routeState.value as? RouteState.Riding)?.seconds != 0) {
+                flow { emit(null) }
+            } else {
+                timer()
             }
         }
             .filterNotNull()
@@ -241,8 +255,11 @@ class MapViewModel : ViewModel() {
                 delay(1000)
                 time += 1
                 emit(time)
+                if (time % 30 == 0) {
+                    driveManager.sendBatch(isFinal = false)
+                }
             }
-        }
+        }.flowOn(provideDispatcher().io)
     }
 
     companion object {
@@ -257,4 +274,3 @@ fun LatLng.toGeoPoint() = GeoPoint(
 fun MapViewState.getDelta(): Float {
     return 20f / zoom.ifZero(1f)
 }
-

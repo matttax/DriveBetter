@@ -4,6 +4,8 @@ import com.matttax.drivebetter.KtorService
 import com.matttax.drivebetter.history.data.RideRepositoryImpl
 import com.matttax.drivebetter.history.domain.RideRepository
 import com.matttax.drivebetter.history.presentation.RidesHistoryViewModel
+import com.matttax.drivebetter.map.data.DriveManagerImpl
+import com.matttax.drivebetter.map.domain.DriveManager
 import com.matttax.drivebetter.map.presentation.MapViewModel
 import com.matttax.drivebetter.profile.data.ProfileRemoteDataSource
 import com.matttax.drivebetter.profile.data.ProfileRepositoryImpl
@@ -30,7 +32,9 @@ private fun dataModule() = module {
     }
 
     factory {
-        MapViewModel()
+        MapViewModel(
+            driveManager = get()
+        )
     }
 
     factory<RideRepository> {
@@ -44,6 +48,13 @@ private fun dataModule() = module {
         ProfileRepositoryImpl(
             profileRemoteDataSource = get(),
             loginStorage = get(),
+        )
+    }
+
+    single<DriveManager> {
+        DriveManagerImpl(
+            ktorService = get(),
+            loginStorage = get()
         )
     }
 

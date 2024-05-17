@@ -1,6 +1,6 @@
 package com.matttax.drivebetter
 
-import NavigatorApp
+import AppNavigator
 import androidx.compose.ui.window.ComposeUIViewController
 
-fun MainViewController() = ComposeUIViewController { NavigatorApp() }
+fun MainViewController() = ComposeUIViewController { AppNavigator() }

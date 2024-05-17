@@ -25,15 +25,18 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.navigation.transition.NavTransition
 
 @Composable
-fun NavigatorApp() {
+fun AppNavigator() {
     PreComposeApp {
         val locationTrackerFactory: LocationTrackerFactory = rememberLocationTrackerFactory(
             accuracy = LocationTrackerAccuracy.Best
         )
         val profileViewModel = koinViewModel(vmClass = ProfileViewModel::class)
         val ridesHistoryViewModel = koinViewModel(vmClass = RidesHistoryViewModel::class)
-        val mapViewModel = koinViewModel(vmClass = MapViewModel::class)
-        mapViewModel.setLocationTracker(locationTrackerFactory.createLocationTracker())
+        val mapViewModel = koinViewModel(vmClass = MapViewModel::class).apply {
+            if (!isLocationManagerInitialized) {
+                setLocationTracker(locationTrackerFactory.createLocationTracker())
+            }
+        }
         val snackbarHostState = remember { SnackbarHostState() }
         AppTheme {
             val navigator = rememberNavigator()
