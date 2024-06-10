@@ -82,6 +82,7 @@ kotlin {
 
                 // caching
                 implementation(libs.settings.multiplatform)
+                implementation(libs.kcrypt)
 
                 // resources
                 implementation(libs.moko.resources)

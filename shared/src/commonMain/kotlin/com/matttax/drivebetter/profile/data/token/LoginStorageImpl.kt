@@ -9,15 +9,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.lighthousegames.logging.KmLog
+import studio.zebro.kcrypt.getKCrypt
 
 class LoginStorageImpl : LoginStorage {
 
     private val settings: Settings by lazy { Settings() }
+    private val kCrypt = getKCrypt()
 
     override var token: String?
-        get() = settings[StorageKeys.TOKEN.key]
+        get() = kCrypt.getString(StorageKeys.TOKEN.key)
         set(value) {
-            settings[StorageKeys.TOKEN.key] = value
+            kCrypt.saveString(StorageKeys.TOKEN.key, value ?: "")
             log.d { "token saved: $token" }
         }
 

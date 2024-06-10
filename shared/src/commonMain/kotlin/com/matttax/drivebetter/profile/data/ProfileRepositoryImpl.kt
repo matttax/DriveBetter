@@ -30,9 +30,8 @@ class ProfileRepositoryImpl(
                 val profile = loginResult.getOrNull()
                 loginStorage.token = profile?.token
                 loginStorage.lastProfile = profile
-                return profile
-            }
-            null
+                profile
+            } else null
         } catch (ex: Throwable) {
             null
         }

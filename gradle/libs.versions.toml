@@ -8,7 +8,7 @@ androidx-activityCompose = "1.8.2"
 ktor = "2.3.10"
 coroutines = "1.8.0"
 android-compileSdk = "34"
-android-minSdk = "24"
+android-minSdk = "26"
 android-targetSdk = "34"
 compose-plugin = "1.6.2"
 mapsMobile = "4.5.1-full"
@@ -24,6 +24,7 @@ charts = "Beta-0.0.5"
 resources = "0.24.0-beta-1"
 mokoGeo = "0.6.0"
 logging = "1.4.2"
+kcrypt = "0.0.15"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -69,6 +70,7 @@ moko-geo = { module =  "dev.icerock.moko:geo", version.ref = "mokoGeo" }
 moko-geo-compose = { module = "dev.icerock.moko:geo-compose", version.ref = "mokoGeo" }
 
 lighthouse-logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
+kcrypt = { module = "io.github.abhriyaroy:KCrypt", version.ref = "kcrypt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
