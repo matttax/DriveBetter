@@ -13,17 +13,17 @@ enum class BottomNavigationItem(
 ) {
     RIDES_HISTORY(
         route = "/rides",
-        title = "Rides",
+        title = "История",
         icon = Icons.Default.History
     ),
     MAP(
         route = "/map",
-        title = "Map",
+        title = "Карта",
         icon = Icons.Default.Map
     ),
     PROFILE(
         route = "/profile",
-        title = "Profile",
+        title = "Профиль",
         icon = Icons.Default.AccountCircle
     )
 }

@@ -61,7 +61,7 @@ fun HistoryScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Title("You're not authorized")
+                Title("Вы не авторизованы")
             }
         }
     }

@@ -7,11 +7,11 @@ class MessageDispatcher(
 ) {
 
     fun onSpeedExceeded(speedViolation: SpeedViolation) {
-        messageSpeller.textToSpeech(English.getSlowDownMessage(), DEFAULT_LANGUAGE)
+        messageSpeller.textToSpeech(Russian.getSlowDownMessage(), DEFAULT_LANGUAGE)
     }
 
     fun onTooSlowDriving(speedViolation: SpeedViolation) {
-        messageSpeller.textToSpeech(English.getSpeedUpText(), DEFAULT_LANGUAGE)
+        messageSpeller.textToSpeech(Russian.getSpeedUpText(), DEFAULT_LANGUAGE)
     }
 
     fun onWarning(text: String) {
@@ -19,27 +19,27 @@ class MessageDispatcher(
     }
 
     fun onRideStarted(km: Double) {
-        messageSpeller.textToSpeech(English.getRideStartedText(km), DEFAULT_LANGUAGE)
+        messageSpeller.textToSpeech(Russian.getRideStartedText(km), DEFAULT_LANGUAGE)
     }
 
     fun onRideStarted() {
-        messageSpeller.textToSpeech(English.getRideStartedTextShort(), DEFAULT_LANGUAGE)
+        messageSpeller.textToSpeech(Russian.getRideStartedTextShort(), DEFAULT_LANGUAGE)
     }
 
     fun onRideEnded() {
-        messageSpeller.textToSpeech(English.getRideEndedText(), DEFAULT_LANGUAGE)
+        messageSpeller.textToSpeech(Russian.getRideEndedText(), DEFAULT_LANGUAGE)
     }
 
-    private object English {
-        fun getRideStartedText(km: Double) = "Ride started. ${km.toInt()} kilometers left."
-        fun getRideStartedTextShort() = "Ride started. Be careful!"
-        fun getRideEndedText() = "Ride ended."
-        fun getSpeedUpText() = "You are driving too slow. Please speed up."
-        fun getSlowDownMessage() = "You are driving too fast. Please slow down."
+    private object Russian {
+        fun getRideStartedText(km: Double) = "Поездка началась. ${km.toInt()} километров осталось."
+        fun getRideStartedTextShort() = "Поездка начата. Приятной дороги!."
+        fun getRideEndedText() = "Поездка завершена."
+        fun getSpeedUpText() = "Вы едете слишком медленно. Ускорьтесь!"
+        fun getSlowDownMessage() = "Вы едете слишком быстро. Снизьте скорость!"
     }
 
     companion object {
-        private val DEFAULT_LANGUAGE = Language.EN
+        private val DEFAULT_LANGUAGE = Language.RU
     }
 
 }

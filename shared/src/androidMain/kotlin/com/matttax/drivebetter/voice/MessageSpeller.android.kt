@@ -17,7 +17,7 @@ actual class MessageSpeller {
         isSpeaking = true
         termSpeech = TextToSpeech(DriveBetterApp.context) {
             if (it == TextToSpeech.SUCCESS) {
-                termSpeech.language = if (language == Language.RU) Locale("ru") else Locale.US
+                termSpeech.language = if (language == Language.RU) Locale("ru","RU") else Locale.US
                 termSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null,"")
             }
         }

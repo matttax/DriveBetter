@@ -238,7 +238,7 @@ class MapViewModel(
                 _routeState.value = when {
                     it.isFailure -> RouteState.Error(it.exceptionOrNull()?.message ?: "Unknown error")
                     it.isSuccess && it.getOrNull().isNullOrEmpty().not() -> RouteState.Results(
-                        it.getOrNull()?.sortedBy { ride -> ride.safetyIndex }!!
+                        it.getOrNull()?.sortedBy { ride -> ride.safetyIndex }?.reversed()!!
                     )
                     else -> RouteState.Empty
                 }

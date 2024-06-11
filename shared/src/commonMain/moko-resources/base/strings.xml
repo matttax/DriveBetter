@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
 <!--    Authorization-->
-    <string name="unauthorized_message">You are not authorized yet</string>
-    <string name="log_in">Log in</string>
-    <string name="sign_up">Sign up</string>
+    <string name="unauthorized_message">Вы не авторизованы</string>
+    <string name="log_in">Войти</string>
+    <string name="sign_up">Регистрация</string>
 
 <!--    Months-->
-    <string name="months_january">Jan</string>
-    <string name="months_february">Feb</string>
-    <string name="months_march">March</string>
-    <string name="months_april">April</string>
-    <string name="months_may">May</string>
-    <string name="months_june">Jun</string>
-    <string name="months_july">Jul</string>
-    <string name="months_august">Aug</string>
-    <string name="months_september">Sep</string>
-    <string name="months_october">Oct</string>
-    <string name="months_november">Nov</string>
-    <string name="months_december">Dec</string>
+    <string name="months_january">Янв</string>
+    <string name="months_february">Фев</string>
+    <string name="months_march">Март</string>
+    <string name="months_april">Апр</string>
+    <string name="months_may">Май</string>
+    <string name="months_june">Июн</string>
+    <string name="months_july">Июл</string>
+    <string name="months_august">Авг</string>
+    <string name="months_september">Сен</string>
+    <string name="months_october">Окт</string>
+    <string name="months_november">Нов</string>
+    <string name="months_december">Дек</string>
 
 <!--    Ride history-->
-    <string name="ride_history">History</string>
-    <string name="speed">Speed</string>
-    <string name="speed_kph">km/h</string>
-    <string name="max_speed">Max</string>
-    <string name="average_speed">Avg</string>
-    <string name="driving_time">Driving time</string>
-    <string name="driving_daylight_time">Daylight</string>
-    <string name="driving_light_nighttime_time">Light nighttime</string>
-    <string name="driving_nighttime_time">Nighttime</string>
-    <string name="weather">Weather</string>
-    <string name="conditions">Conditions</string>
-    <string name="visibility">Visibility</string>
-    <string name="speeding">Speeding</string>
-    <string name="dangerous_driving">Dangerous driving</string>
+    <string name="ride_history">История</string>
+    <string name="speed">Скорость</string>
+    <string name="speed_kph">км/ч</string>
+    <string name="max_speed">Макс</string>
+    <string name="average_speed">Сред</string>
+    <string name="driving_time">Время поездки</string>
+    <string name="driving_daylight_time">Дневное</string>
+    <string name="driving_light_nighttime_time">Сумерки</string>
+    <string name="driving_nighttime_time">Ночное</string>
+    <string name="weather">Погода</string>
+    <string name="conditions">Условия</string>
+    <string name="visibility">Видимость</string>
+    <string name="speeding">Превышения скорости</string>
+    <string name="dangerous_driving">Опасное вождение</string>
 
 <!--    Map-->
-    <string name="search">Search</string>
-    <string name="distance">Distance</string>
-    <string name="time">Time</string>
-    <string name="safety_index">Safety index</string>
-    <string name="time_with_traffic">Time with traffic</string>
-    <string name="railway_crossing_count">Railway crossings</string>
-    <string name="pedestrian_crossing_count">Pedestrian crossings</string>
-    <string name="start_ride">Start ride</string>
-    <string name="finish_ride">Finish</string>
-    <string name="no_routes">No routes found</string>
+    <string name="search">Поиск</string>
+    <string name="distance">Расстояние</string>
+    <string name="time">Время</string>
+    <string name="safety_index">Индекс опасности</string>
+    <string name="time_with_traffic">Время с траффиком</string>
+    <string name="railway_crossing_count">ЖД пути</string>
+    <string name="pedestrian_crossing_count">Пешеходные переходы</string>
+    <string name="start_ride">Начать поездку</string>
+    <string name="finish_ride">Завершить</string>
+    <string name="no_routes">Маршруты не найдены</string>
 
 </resources>
